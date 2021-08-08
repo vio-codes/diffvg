@@ -204,8 +204,8 @@ def main(args):
                  None,
                  *scene_args)
     # Save the intermediate render.
-    pydiffvg.imwrite(img.cpu(), '/content/drive/MyDrive/Unnatural space/final-{}.png'.format(target), gamma=gamma)
-    pydiffvg.save_svg('/content/drive/MyDrive/Unnatural space/final-{}.svg'.format(t),
+    pydiffvg.imwrite(img.cpu(), '/content/drive/MyDrive/Unnatural space/final-{}.png'.format(args.target), gamma=gamma)
+    pydiffvg.save_svg('/content/drive/MyDrive/Unnatural space/final-{}.svg'.format(args.target),
                               canvas_width, canvas_height, shapes, shape_groups)
     # Convert the intermediate renderings to a video.
     # Render a picture with each stroke.
@@ -222,7 +222,7 @@ def main(args):
     from subprocess import call
     call(["ffmpeg", "-y", "-framerate", "60", "-i",
       "/content/res/stroke_%d.png", "-vb", "20M",
-      "/content/drive/MyDrive/Unnatural space/out_strokes-{}.mp4".format(target)])
+      "/content/drive/MyDrive/Unnatural space/out_strokes-{}.mp4".format(args.target)])
 
 
 if __name__ == "__main__":
