@@ -204,8 +204,8 @@ def main(args):
                  None,
                  *scene_args)
     # Save the intermediate render.
-    pydiffvg.imwrite(img.cpu(), '/content/final-{}.png'.format(args.target), gamma=gamma)
-    pydiffvg.save_svg('/content/final-{}.svg'.format(args.target),
+    pydiffvg.imwrite(img.cpu(), '/content/final.png', gamma=gamma)
+    pydiffvg.save_svg('/content/final.svg',
                               canvas_width, canvas_height, shapes, shape_groups)
     # Convert the intermediate renderings to a video.
     # Render a picture with each stroke.
@@ -222,7 +222,7 @@ def main(args):
     from subprocess import call
     call(["ffmpeg", "-y", "-framerate", "60", "-i",
       "/content/res/stroke_%d.png", "-vb", "20M",
-      "/content/out_strokes-{}.mp4".format(args.target)])
+      "/content/out_strokes-final.mp4"])
 
 
 if __name__ == "__main__":
