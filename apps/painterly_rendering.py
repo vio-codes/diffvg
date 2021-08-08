@@ -195,21 +195,35 @@ def main(args):
             pydiffvg.save_svg('results/painterly_rendering/iter_{}.svg'.format(t),
                               canvas_width, canvas_height, shapes, shape_groups)
     
-    # Render the final result.
-    img = render(target.shape[1], # width
-                 target.shape[0], # height
+        # Render the final result.
+    img = render(canvas_width, # width
+                 canvas_height, # height
                  2,   # num_samples_x
                  2,   # num_samples_y
                  0,   # seed
                  None,
                  *scene_args)
     # Save the intermediate render.
-    pydiffvg.imwrite(img.cpu(), 'results/painterly_rendering/final.png'.format(t), gamma=gamma)
+    pydiffvg.imwrite(img.cpu(), '/content/drive/MyDrive/Unnatural space/final-{}.png'.format(target), gamma=gamma)
+    pydiffvg.save_svg('/content/drive/MyDrive/Unnatural space/final-{}.svg'.format(t),
+                              canvas_width, canvas_height, shapes, shape_groups)
+    # Convert the intermediate renderings to a video.
+    # Render a picture with each stroke.
+    with torch.no_grad():
+        for i in range(args.num_paths):
+            print("Strokes:",i)
+            scene_args = pydiffvg.RenderFunction.serialize_scene(\
+              canvas_width, canvas_height, shapes[:i+1], shape_groups[:i+1])
+            img = render(canvas_width, canvas_height, 2, 2, t, None, *scene_args)
+            img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
+            pydiffvg.imwrite(img.cpu(), '/content/res/stroke_{}.png'.format(i), gamma=gamma)
+    print("ffmpeging")
     # Convert the intermediate renderings to a video.
     from subprocess import call
-    call(["ffmpeg", "-framerate", "24", "-i",
-        "results/painterly_rendering/iter_%d.png", "-vb", "20M",
-        "results/painterly_rendering/out.mp4"])
+    call(["ffmpeg", "-y", "-framerate", "60", "-i",
+      "/content/res/stroke_%d.png", "-vb", "20M",
+      "/content/drive/MyDrive/Unnatural space/out_strokes-{}.mp4".format(target)])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
