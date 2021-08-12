@@ -17,7 +17,7 @@ import math
 
 pydiffvg.set_print_timing(True)
 
-gamma = 1.0
+gamma = 2.2
 
 def main(args):
     # Use GPU if available
@@ -220,8 +220,8 @@ def main(args):
     print("ffmpeging")
     # Convert the intermediate renderings to a video.
     from subprocess import call
-    call(["ffmpeg", "-y", "-c:v libx264", "-framerate", "60", "-i",
-      "/content/res/stroke_%d.png", "-vb", "20M",
+    call(["ffmpeg", "-y", "-framerate", "60", "-i",
+      "/content/res/stroke_%d.png","-vcodec libx264", "-vb", "20M",
       "/content/out_strokes-final.mp4"])
 
 
