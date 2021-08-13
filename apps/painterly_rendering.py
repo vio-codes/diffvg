@@ -220,8 +220,8 @@ def main(args):
     print("ffmpeging")
     # Convert the intermediate renderings to a video.
     from subprocess import call
-    call(["ffmpeg", "-y", "-framerate", "60", "-i",
-      "/content/res/stroke_%d.png", "-vcodec" ,"libx264", "-vb", "20M",
+    call(["ffmpeg","-f","image2", "-y", "-framerate", "60", "-i",
+      "/content/res/stroke_%d.png", "-c:v" ,"libx264", "-vb", "20M",
       "/content/out_strokes-final.mp4"])
 
 
