@@ -206,7 +206,7 @@ def main(args):
     # Save the intermediate render.
     pydiffvg.imwrite(img.cpu(), '/content/final.png', gamma=gamma)
     pydiffvg.save_svg('/content/final.svg',
-                              canvas_width, canvas_height, shapes, shape_groups)
+                              canvas_width, canvas_height, shapes, shape_groups, use_gamma = True)
     # Convert the intermediate renderings to a video.
     # Render a picture with each stroke.
     with torch.no_grad():
