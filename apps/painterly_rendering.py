@@ -17,7 +17,7 @@ import math
 
 pydiffvg.set_print_timing(True)
 
-gamma = 1/2.2
+gamma = 2.2
 
 def main(args):
     # Use GPU if available
