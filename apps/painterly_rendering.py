@@ -246,6 +246,8 @@ def main(args):
         if args.use_blob:
             for group in shape_groups:
                 group.fill_color.data.clamp_(0.0, 1.0)
+        elif args.use_gradients:
+            continue        
         else:
             for group in shape_groups:
                 group.stroke_color.data.clamp_(0.0, 1.0)
