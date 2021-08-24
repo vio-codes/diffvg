@@ -16,6 +16,10 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
     root.set('xmlns', 'http://www.w3.org/2000/svg')
     root.set('width', str(width))
     root.set('height', str(height))
+    rect = etree.SubElement(root, "rect")
+    rect.set('width', "100%")
+    rect.set('height', "100%")
+    rect.set("fill", "white")
     defs = etree.SubElement(root, 'defs')
     g = etree.SubElement(root, 'g')
     if use_gamma:
@@ -61,7 +65,6 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
                 for j in range(offsets.shape[0]):
                     stop = etree.SubElement(color, 'stop')
                     stop.set('offset', str(offsets[j]))
-                    print("Offset:",str(offsets[j]))
                     c = stop_colors[j, :]
                     stop.set('stop-color', 'rgb({}, {}, {})'.format(\
                         int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
@@ -148,4 +151,5 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
             shape_node.set('stroke-linejoin', 'round')
 
     with open(filename, "w") as f:
+        print("SVG",prettify(root))
         f.write(prettify(root))
