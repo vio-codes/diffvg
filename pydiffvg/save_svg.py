@@ -66,8 +66,8 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
                     stop = etree.SubElement(color, 'stop')
                     stop.set('offset', str(offsets[j]))
                     c = stop_colors[j, :]
-                    stop.set('stop-color', 'rgb({}, {}, {})'.format(\
-                        255 * c[0], 255 * c[1], 255 * c[2]))
+                    stop.set('stop-color', 'rgba({}, {}, {},{})'.format(\
+                        int(255 * c[0]), int(255 * c[1]), int(255 * c[2]), c[3]))
                     stop.set('stop-opacity', '{}'.format(c[3]))
 
         if shape_group.fill_color is not None:

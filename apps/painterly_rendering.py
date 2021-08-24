@@ -17,7 +17,7 @@ import math
 
 pydiffvg.set_print_timing(True)
 
-gamma = 1
+gamma = 2.2
 
 
 def main(args):
@@ -201,7 +201,7 @@ def main(args):
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
     if len(stroke_width_vars) > 0:
         width_optim = torch.optim.Adam(stroke_width_vars, lr=0.1)
-    color_optim = torch.optim.Adam(color_vars, lr=0.01)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
@@ -260,7 +260,7 @@ def main(args):
 
         if t % 10 == 0 or t == args.num_iter - 1:
             pydiffvg.save_svg('results/painterly_rendering/iter_{}.svg'.format(t),
-                              canvas_width, canvas_height, shapes, shape_groups)
+                              canvas_width, canvas_height, shapes, shape_groups,use_gamma =True)
 
         # Render the final result.
     img = render(canvas_width,  # width
@@ -270,10 +270,11 @@ def main(args):
                  0,   # seed
                  None,
                  *scene_args)
-    # Save the intermediate render.
+    img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
+            img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
     pydiffvg.imwrite(img.cpu(), '/content/final.png', gamma=gamma)
     pydiffvg.save_svg('/content/final.svg',
-                      canvas_width, canvas_height, shapes, shape_groups)
+                      canvas_width, canvas_height, shapes, shape_groups, use_gamma =True)
     # Convert the intermediate renderings to a video.
     # Render a picture with each stroke.
     with torch.no_grad():
