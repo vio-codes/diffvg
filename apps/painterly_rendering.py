@@ -17,7 +17,7 @@ import math
 
 pydiffvg.set_print_timing(True)
 
-gamma = 2.2
+gamma = 1
 
 
 def main(args):
@@ -260,7 +260,7 @@ def main(args):
 
         if t % 10 == 0 or t == args.num_iter - 1:
             pydiffvg.save_svg('results/painterly_rendering/iter_{}.svg'.format(t),
-                              canvas_width, canvas_height, shapes, shape_groups,use_gamma =True)
+                              canvas_width, canvas_height, shapes, shape_groups)
 
         # Render the final result.
     img = render(canvas_width,  # width
@@ -274,7 +274,7 @@ def main(args):
             img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
     pydiffvg.imwrite(img.cpu(), '/content/final.png', gamma=gamma)
     pydiffvg.save_svg('/content/final.svg',
-                      canvas_width, canvas_height, shapes, shape_groups, use_gamma =True)
+                      canvas_width, canvas_height, shapes, shape_groups)
     # Convert the intermediate renderings to a video.
     # Render a picture with each stroke.
     with torch.no_grad():
