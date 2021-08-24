@@ -186,8 +186,8 @@ def main(args):
             group.fill_color.begin.requires_grad = True
             group.fill_color.offsets.requires_grad = True
             group.fill_color.stop_colors.requires_grad = True
-            color_vars.extend(group.fill_color.begin, group.fill_color.end,
-                              group.fill_color.offsets, group.fill_color.stop_colors)
+            color_vars.append([group.fill_color.begin, group.fill_color.end,
+                              group.fill_color.offsets, group.fill_color.stop_colors])
     else:
         for group in shape_groups:
             group.stroke_color.requires_grad = True
