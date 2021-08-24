@@ -70,6 +70,49 @@ def main(args):
                                                                         random.random(),
                                                                         random.random()]))
             shape_groups.append(path_group)
+    elif args.use_gradients:  
+            for i in range(num_paths):
+            num_segments = random.randint(3, 5)
+            num_control_points = torch.zeros(num_segments, dtype = torch.int32) + 2
+            points = []
+            p0 = (random.random(), random.random())
+            points.append(p0)
+            for j in range(num_segments):
+                radius = 0.05
+                p1 = (p0[0] + radius * (random.random() - 0.5), p0[1] + radius * (random.random() - 0.5))
+                p2 = (p1[0] + radius * (random.random() - 0.5), p1[1] + radius * (random.random() - 0.5))
+                p3 = (p2[0] + radius * (random.random() - 0.5), p2[1] + radius * (random.random() - 0.5))
+                points.append(p1)
+                points.append(p2)
+                if j < num_segments - 1:
+                    points.append(p3)
+                    p0 = p3
+            points = torch.tensor(points)
+            points[:, 0] *= canvas_width
+            points[:, 1] *= canvas_height
+            path = pydiffvg.Path(num_control_points = num_control_points,
+                                 points = points,
+                                 stroke_width = torch.tensor(1.0),
+                                 is_closed = True)
+            shapes.append(path)
+            color = pydiffvg.LinearGradient(\
+            begin = torch.tensor([random.random()*canvas_width, random.random()*canvas_hight]),
+            end = torch.tensor([random.random()*canvas_width, random.random()*canvas_hight]),
+            offsets = torch.tensor([0.0, 1.0]),
+            stop_colors = torch.tensor([[random.random(),
+                                                                        random.random(),
+                                                                        random.random(),
+                                                                        random.random()],
+                                [random.random(),
+                                                                        random.random(),
+                                                                        random.random(),
+                                                                        random.random()]]))
+            path_group = pydiffvg.ShapeGroup(shape_ids = torch.tensor([len(shapes) - 1]),
+                                             fill_color = torch.tensor([random.random(),
+                                                                        random.random(),
+                                                                        random.random(),
+                                                                        random.random()]))
+            shape_groups.append(path_group)
     else:
         for i in range(num_paths):
             num_segments = random.randint(1, 3)
@@ -232,5 +275,6 @@ if __name__ == "__main__":
     parser.add_argument("--use_lpips_loss", dest='use_lpips_loss', action='store_true')
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--use_blob", dest='use_blob', action='store_true')
+    parser.add_argument("--use_gradients", dest='use_gradients', action='store_true')
     args = parser.parse_args()
     main(args)
