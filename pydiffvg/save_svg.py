@@ -61,7 +61,8 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
                 for j in range(offsets.shape[0]):
                     stop = etree.SubElement(color, 'stop')
                     stop.set('offset', str(offsets[j]))
-                    c = lg.stop_colors[j, :]
+                    print("Offset:",str(offsets[j]))
+                    c = stop_colors[j, :]
                     stop.set('stop-color', 'rgb({}, {}, {})'.format(\
                         int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
                     stop.set('stop-opacity', '{}'.format(c[3]))
