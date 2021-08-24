@@ -251,10 +251,9 @@ def main(args):
             for group in shape_groups:
                 group.fill_color.data.clamp_(0.0, 1.0)
         elif args.use_gradients:
-            #for group in shape_groups:
-                #group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
-                #group.fill_color.offsets.data.clamp_(0.0, 1.0)
-            continue    
+            for group in shape_groups:
+                group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
+                group.fill_color.offsets.data.clamp_(0.0, 1.0)   
         else:
             for group in shape_groups:
                 group.stroke_color.data.clamp_(0.0, 1.0)
