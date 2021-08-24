@@ -104,15 +104,18 @@ def main(args):
                                  stroke_width=torch.tensor(1.0),
                                  is_closed=True)
             shapes.append(path)
-            gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.random()*canvas_width, random.random()*canvas_height]), end=torch.tensor([random.random()*canvas_width, random.random()*canvas_height]), offsets=torch.tensor([0.0, 1.0]), stop_colors=torch.tensor([[random.random(),
-                                                                                                                                                                                                                                                                                   random.random(),
-                                                                                                                                                                                                                                                                                   random.random(),
-                                                                                                                                                                                                                                                                                   random.random()],
-                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                  [random.random(),
-                                                                                                                                                                                                                                                                                   random.random(),
-                                                                                                                                                                                                                                                                                   random.random(),
-                                                                                                                                                                                                                                                                                   random.random()]]))
+            gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.random()*canvas_width, random.random()*canvas_height]), end=torch.tensor([random.random()*canvas_width, random.random()*canvas_height]), offsets=torch.tensor([random.random(), random.random(), random.random()]), stop_colors=torch.tensor([[random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random()],
+                                                                                                                                                                                                                                                                                                                        [random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random()],
+                                                                                                                                                                                                                                                                                                                        [random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random(),
+                                                                                                                                                                                                                                                                                                                         random.random()]]))
             path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor([len(shapes) - 1]),
                                              fill_color=gradient)
             shape_groups.append(path_group)
@@ -188,7 +191,7 @@ def main(args):
             group.fill_color.offsets.requires_grad = True
             group.fill_color.stop_colors.requires_grad = True
             color_vars.extend([group.fill_color.begin, group.fill_color.end,
-                               group.fill_color.stop_colors])
+                              group.fill_color.offsets, group.fill_color.stop_colors])
     else:
         for group in shape_groups:
             group.stroke_color.requires_grad = True
@@ -248,9 +251,9 @@ def main(args):
             for group in shape_groups:
                 group.fill_color.data.clamp_(0.0, 1.0)
         elif args.use_gradients:
-            for group in shape_groups:
-                group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
-                group.fill_color.offsets.data.clamp_(0.0, 1.0)
+            #for group in shape_groups:
+                #group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
+                #group.fill_color.offsets.data.clamp_(0.0, 1.0)
         else:
             for group in shape_groups:
                 group.stroke_color.data.clamp_(0.0, 1.0)
