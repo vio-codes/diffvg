@@ -67,7 +67,7 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
                     stop.set('offset', str(offsets[j]))
                     c = stop_colors[j, :]
                     stop.set('stop-color', 'rgb({}, {}, {})'.format(\
-                        int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
+                        255 * c[0], 255 * c[1], 255 * c[2]))
                     stop.set('stop-opacity', '{}'.format(c[3]))
 
         if shape_group.fill_color is not None:
@@ -145,7 +145,7 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
             else:
                 c = shape_group.stroke_color.data.cpu().numpy()
                 shape_node.set('stroke', 'rgb({}, {}, {})'.format(\
-                    255 * c[0], 255 * c[1], 255 * c[2]))
+                    int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
                 shape_node.set('stroke-opacity', str(c[3]))
             shape_node.set('stroke-linecap', 'round')
             shape_node.set('stroke-linejoin', 'round')
