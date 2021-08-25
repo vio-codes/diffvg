@@ -19,19 +19,10 @@ pydiffvg.set_print_timing(True)
 gamma = 1
 
 def convert_svg2png(svg_file, png_file, resolution = 72):
-    import wand.image
-    from wand.api import library
-    import wand.color
-    with open(svg_file, "r") as svg_file:
-        with wand.image.Image() as image:
-            with wand.color.Color('transparent') as background_color:
-                library.MagickSetBackgroundColor(image.wand, 
-                                                 background_color.resource) 
-            svg_blob = svg_file.read().encode('utf-8')
-            image.read(blob=svg_blob, resolution = resolution)
-            png_image = image.make_blob("png32")
-    with open(png_file, "wb") as out:
-        out.write(png_image)
+    import pyvips
+
+    image = pyvips.Image.new_from_file(svg_file, dpi=resolution)
+    image.write_to_file(png_file)
 
 def convert_svg2png2(svg_file, png_file):
     from wand.image import Image
