@@ -9,6 +9,7 @@ Kitty: python painterly_rendering.py imgs/kitty.jpg --num_paths 1024 --use_blob
 import pydiffvg
 import torch
 import skimage
+import ttools.modules
 import skimage.io
 import skimage.color
 import random
@@ -22,7 +23,7 @@ gamma = 1
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
-
+    perception_loss = ttools.modules.LPIPS().to(pydiffvg.get_device())
     #target = torch.from_numpy(skimage.io.imread('imgs/lena.png')).to(torch.float32) / 255.0
     target = torch.from_numpy(skimage.io.imread(
         args.target)).to(torch.float32) / 255.0   
@@ -148,7 +149,7 @@ def main(args):
         smooth = 1 
         intersection = (img * target).sum()                            
         dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)  
-        loss = 1- dice
+        loss = perception_loss(img, target) + 1- dice
         print('render loss:', loss.item())  
         # Backpropagate the gradients.
         loss.backward()
