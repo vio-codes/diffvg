@@ -70,9 +70,9 @@ def main(args):
                              stroke_width=torch.tensor(1.0),
                              is_closed=True)
         shapes.append(path)
-        gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.random()*100, random.random()*100]),
+        gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.random()*canvas_width, random.random()*canvas_height]),
                                            end=torch.tensor(
-                                               [random.random()*100, random.random()*100]),
+                                               [random.random()*canvas_width, random.random()*canvas_height]),
                                            offsets=torch.tensor([0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
                                                                       random.random(),

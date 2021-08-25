@@ -23,8 +23,8 @@ def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
         color = shape_group.fill_color
         offsets = color.offsets.data.cpu().numpy()
         stop_colors = color.stop_colors.data.cpu().numpy()
-        linear_gradient = dwg.linearGradient(id=i, start=(str(int(color.begin[0].item()))+'%', str(int(color.begin[1].item()))+'%'),
-         end=(str(int(color.end[0].item()))+'%', str(int(color.end[1].item()))+'%'), gradientUnits='objectBoundingBox', spreadMethod='pad')
+        linear_gradient = dwg.linearGradient(id=i, start=(color.begin[0].item(), color.begin[1].item()),
+         end=(color.end[0].item(), color.end[1].item()), gradientUnits='userSpaceOnUse', spreadMethod='pad')
         dwg.defs.add(linear_gradient)
         for j in range(offsets.shape[0]):
             c = stop_colors[j, :]
