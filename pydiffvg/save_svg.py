@@ -17,10 +17,6 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
     root.set('xmlns', 'http://www.w3.org/2000/svg')
     root.set('width', str(width))
     root.set('height', str(height))
-    rect = etree.SubElement(root, "rect")
-    rect.set('width', "100%")
-    rect.set('height', "100%")
-    rect.set("fill", "white")
     defs = etree.SubElement(root, 'defs')
     g = etree.SubElement(root, 'g')
     if use_gamma:

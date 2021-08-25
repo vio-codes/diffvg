@@ -20,14 +20,26 @@ gamma = 1
 
 def convert_svg2png(svg_file, png_file, resolution = 72):
     import wand.image
-
+    from wand.api import library
+    import wand.color
     with open(svg_file, "r") as svg_file:
         with wand.image.Image() as image:
+            with wand.color.Color('transparent') as background_color:
+                library.MagickSetBackgroundColor(image.wand, 
+                                                 background_color.resource) 
             svg_blob = svg_file.read().encode('utf-8')
             image.read(blob=svg_blob, resolution = resolution)
             png_image = image.make_blob("png32")
     with open(png_file, "wb") as out:
         out.write(png_image)
+
+def convert_svg2png2(svg_file, png_file):
+    import wand.image
+    with Image(filename=svg_file) as original:
+        with original.convert('png') as converted:
+            converted.save(filename=png_file) 
+            converted.format = 'svg'  
+            converted.save(filename=png_file+".svg")     
 
 def main(args):
     # Use GPU if available
@@ -128,7 +140,7 @@ def main(args):
             canvas_width, canvas_height, shapes, shape_groups)
         pydiffvg.save_svg('results/painterly_svg/iter_{}.svg'.format(t),
                               canvas_width, canvas_height, shapes, shape_groups)
-        convert_svg2png('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
+        convert_svg2png2('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
         #TODO  dice loss
         img = torch.from_numpy(skimage.io.imread('results/painterly_svg/iter_{}.png'.format(t))).to(torch.float32) / 255.0
         img= target.pow(gamma)
