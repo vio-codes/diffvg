@@ -30,6 +30,7 @@ def main(args):
     #target = torch.from_numpy(skimage.io.imread('imgs/lena.png')).to(torch.float32) / 255.0
     target = torch.from_numpy(skimage.io.imread(
         args.target)).to(torch.float32) / 255.0
+    print("Target initial size", target.size())    
     target = target.pow(gamma)
     target = target.to(pydiffvg.get_device())
     target = target.unsqueeze(0)
@@ -120,11 +121,12 @@ def main(args):
         convert_svg2png('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
         #TODO  dice loss
         img = torch.from_numpy(skimage.io.imread('results/painterly_svg/iter_{}.png'.format(t))).to(torch.float32) / 255.0
+        print("img shape:",img.size())
         img= target.pow(gamma)
         img = target.to(pydiffvg.get_device())
         img = target.unsqueeze(0)
         img = target.permute(0, 3, 1, 2)
-        print("img shape:",img.size,"target shape:",target.size)
+        
         loss = (img - target).pow(2).mean()
         print('render loss:', loss.item())
 
