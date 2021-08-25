@@ -10,6 +10,7 @@ import pydiffvg
 import torch
 import skimage
 import skimage.io
+import skimage.color
 import random
 import argparse
 import math
@@ -120,7 +121,10 @@ def main(args):
                               canvas_width, canvas_height, shapes, shape_groups)
         convert_svg2png('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
         #TODO  dice loss
-        img = torch.from_numpy(skimage.io.imread('results/painterly_svg/iter_{}.png'.format(t))).to(torch.float32) / 255.0
+
+        image = skimage.io.imread('results/painterly_svg/iter_{}.png'.format(t))
+        image = skimage.color.rgba2rgb(image)
+        img = torch.from_numpy(image).to(torch.float32) / 255.0
         print("img shape:",img.size())
         img= target.pow(gamma)
         img = target.to(pydiffvg.get_device())
