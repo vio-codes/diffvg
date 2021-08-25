@@ -93,30 +93,41 @@ def main(args):
 
     points_vars = []
     color_vars = []
+    begin_vars =[]
+    end_vars =[]
+    offsets_vars =[]
     for path in shapes:
         path.points.requires_grad = True
         points_vars.append(path.points)
 
     for group in shape_groups:
             group.fill_color.end.requires_grad = True
+            end_vars.extend(group.fill_color.end)
             group.fill_color.begin.requires_grad = True
+            begin_vars.extend(group.fill_color.begin)
             group.fill_color.offsets.requires_grad = True
+            offsets_vars.extend(group.fill_color.offsets)
             group.fill_color.stop_colors.requires_grad = True
-            color_vars.extend(
-                [group.fill_color.begin, group.fill_color.end, group.fill_color.offsets, group.fill_color.stop_colors])
+            color_vars.extend( group.fill_color.stop_colors)
  
         
     scene_args = pydiffvg.RenderFunction.serialize_scene(canvas_width, canvas_height, shapes, shape_groups)
     render = pydiffvg.RenderFunction.apply
     # Optimize
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
-
     color_optim = torch.optim.Adam(color_vars, lr=0.1)
+    begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
+    end_optim = torch.optim.Adam(end_vars, lr=1.0)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
         points_optim.zero_grad()
         color_optim.zero_grad()
+        begin_optim.zero_grad()
+        end_optim.zero_grad()
+        offsets_optim.zero_grad()
+
         scene_args = pydiffvg.RenderFunction.serialize_scene( canvas_width, canvas_height, shapes, shape_groups)
         img = render(canvas_width, # width
                      canvas_height, # height
@@ -156,10 +167,22 @@ def main(args):
         #TODO break color_optim into more optimizers
         points_optim.step()
         color_optim.step()
+        begin_optim.step()
+        end_optim.step()
+        offsets_optim.step()
 
         for group in shape_groups:
-            #TODO Clam all the data
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
+            group.fill_color.offsets.data.clamp_(0.0, 1.0)
+            group.fill_color.begin[0].data.clamp_(0.0,canvas_width)
+            group.fill_color.begin[1].data.clamp_(0.0,canvas_height)
+            group.fill_color.end[0].data.clamp_(0.0,canvas_width)
+            group.fill_color.end[1].data.clamp_(0.0,canvas_height)
+        for path in shapes:
+            path.points.requires_grad = True
+            path.points[:, 0].data.clamp_(0.0,canvas_width)
+            path.points[:, 1].data.clamp_(0.0, canvas_height)
+               
 
         # Render the final result
     pydiffvg.save_svg('/content/final.svg',
