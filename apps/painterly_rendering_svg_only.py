@@ -135,7 +135,7 @@ def main(args):
         # Forward pass: render the image.
         pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
                               canvas_width, canvas_height, shapes, shape_groups)
-        convert_svg2png2('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
+        convert_svg2png('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
         #TODO  dice loss
         img = torch.from_numpy(skimage.io.imread('results/painterly_svg/iter_{}.png'.format(t))).to(torch.float32) / 255.0
         img= target.pow(gamma)
