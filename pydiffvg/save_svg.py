@@ -2,6 +2,7 @@ import torch
 import pydiffvg
 import xml.etree.ElementTree as etree
 from xml.dom import minidom
+import os
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
@@ -148,7 +149,7 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
                 shape_node.set('stroke-opacity', str(c[3]))
             shape_node.set('stroke-linecap', 'round')
             shape_node.set('stroke-linejoin', 'round')
-
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w") as f:
         f.write(prettify(root))  
         f.close()
