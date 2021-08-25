@@ -19,11 +19,6 @@ pydiffvg.set_print_timing(True)
 
 gamma = 1
 
-def convert_svg2png(svg_file, png_file):
-    import cairosvg
-    cairosvg.svg2png(url=svg_file, write_to=png_file)
-
-
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
@@ -137,34 +132,25 @@ def main(args):
                      None,
                      *scene_args)
         # Forward pass: render the image.
-        pydiffvg.imwrite(img.cpu(), 'results/painterly_svg/iter_{}_original1.png'.format(t), gamma=gamma)
         img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
         # Save the intermediate render.
-        pydiffvg.imwrite(img.cpu(), 'results/painterly_svg/iter_{}_original.png'.format(t), gamma=gamma)
+        pydiffvg.imwrite(img.cpu(), 'results/painterly_svg/iter_{}.png'.format(t), gamma=gamma)
         img = img[:, :, :3]
         # Convert img from HWC to NCHW
         img = img.unsqueeze(0)
-        img2 = img.permute(0, 3, 1, 2) # NHWC -> NCHW
+        img = img.permute(0, 3, 1, 2) # NHWC -> NCHW
+        
         pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
-                              canvas_width, canvas_height, shapes, shape_groups)
-        convert_svg2png('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
+                              canvas_width, canvas_height, shapes, shape_groups)                    
+        
+        
         #TODO  dice loss
-
-        image = skimage.io.imread('results/painterly_svg/iter_{}.png'.format(t))
-        image = skimage.color.rgba2rgb(image)
-        img = torch.from_numpy(image).to(torch.float32) / 255.0
-        img= img.pow(gamma)
-        img = img.to(pydiffvg.get_device())
-        img = img.unsqueeze(0)
-        img = img.permute(0, 3, 1, 2)
-
-        loss = (img2 - target).pow(2).mean()
+        loss = (img - target).pow(2).mean()
         print('render loss:', loss.item())  
         # Backpropagate the gradients.
         loss.backward()
 
         # Take a gradient descent step.
-        #TODO break color_optim into more optimizers
         points_optim.step()
         color_optim.step()
         begin_optim.step()
