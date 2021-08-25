@@ -124,7 +124,7 @@ def main(args):
         img = target.to(pydiffvg.get_device())
         img = target.unsqueeze(0)
         img = target.permute(0, 3, 1, 2)
-        print("img shape:",img.size,"target shape:"target.size)
+        print("img shape:",img.size,"target shape:",target.size)
         loss = (img - target).pow(2).mean()
         print('render loss:', loss.item())
 
