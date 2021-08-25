@@ -105,7 +105,9 @@ def main(args):
             color_vars.extend(
                 [group.fill_color.begin, group.fill_color.end, group.fill_color.offsets, group.fill_color.stop_colors])
  
-
+        
+    scene_args = pydiffvg.RenderFunction.serialize_scene(canvas_width, canvas_height, shapes, shape_groups)
+    render = pydiffvg.RenderFunction.apply
     # Optimize
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
 
@@ -130,7 +132,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2)
 
         loss = (img - target).pow(2).mean()
-    
+        print('render loss:', loss.item())  
         # Backpropagate the gradients.
         loss.backward()
 
