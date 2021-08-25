@@ -102,11 +102,11 @@ def main(args):
 
     for group in shape_groups:
             group.fill_color.end.requires_grad = True
-            end_vars.extend(group.fill_color.end)
+            end_vars.extend([group.fill_color.end])
             group.fill_color.begin.requires_grad = True
-            begin_vars.extend(group.fill_color.begin)
+            begin_vars.extend([group.fill_color.begin])
             group.fill_color.offsets.requires_grad = True
-            offsets_vars.extend(group.fill_color.offsets)
+            offsets_vars.extend([group.fill_color.offsets])
             group.fill_color.stop_colors.requires_grad = True
             color_vars.extend([group.fill_color.stop_colors])
  
