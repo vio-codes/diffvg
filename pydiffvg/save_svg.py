@@ -21,7 +21,7 @@ def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
         # color for the blob
         shape = shapes[shape_group.shape_ids[0]]
         color = shape_group.fill_color
-        offsets = offsets.offsets.data.cpu().numpy()
+        offsets = color.offsets.data.cpu().numpy()
         stop_colors = color.stop_colors.data.cpu().numpy()
         linear_gradient = dwg.linearGradient((color.begin[0].item(
         ), color.begin[1].item()), (color.end[0].item(), color.end[1].item()))
