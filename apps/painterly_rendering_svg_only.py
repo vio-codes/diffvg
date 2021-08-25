@@ -153,7 +153,7 @@ def main(args):
         intersection = (img * target).sum()
         dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)
         criterion = nn.BCELoss()
-        loss = perception_loss(img, target) + 1 - dice + criterion(img, target)
+        loss = perception_loss(img, target) + 1 - dice 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
