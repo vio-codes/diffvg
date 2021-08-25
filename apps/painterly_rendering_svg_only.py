@@ -126,11 +126,11 @@ def main(args):
         image = skimage.color.rgba2rgb(image)
         img = torch.from_numpy(image).to(torch.float32) / 255.0
         print("img shape:",img.size())
-        img= target.pow(gamma)
-        img = target.to(pydiffvg.get_device())
-        img = target.unsqueeze(0)
-        img = target.permute(0, 3, 1, 2)
-        
+        img= img.pow(gamma)
+        img = img.to(pydiffvg.get_device())
+        img = img.unsqueeze(0)
+        img = img.permute(0, 3, 1, 2)
+
         loss = (img - target).pow(2).mean()
         print('render loss:', loss.item())
 
