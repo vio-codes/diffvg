@@ -108,7 +108,7 @@ def main(args):
             group.fill_color.offsets.requires_grad = True
             offsets_vars.extend(group.fill_color.offsets)
             group.fill_color.stop_colors.requires_grad = True
-            color_vars.extend( group.fill_color.stop_colors)
+            color_vars.extend([group.fill_color.stop_colors])
  
         
     scene_args = pydiffvg.RenderFunction.serialize_scene(canvas_width, canvas_height, shapes, shape_groups)
