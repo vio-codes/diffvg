@@ -139,13 +139,18 @@ def main(args):
         # Convert img from HWC to NCHW
         img = img.unsqueeze(0)
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW
-        
+
         pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
                               canvas_width, canvas_height, shapes, shape_groups)                    
         
         
         #TODO  dice loss
-        loss = (img - target).pow(2).mean()
+        img = img.view(-1)
+        target = target.view(-1)
+        smooth = 1 
+        intersection = (img * target).sum()                            
+        dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)  
+        loss = 1- dice
         print('render loss:', loss.item())  
         # Backpropagate the gradients.
         loss.backward()
