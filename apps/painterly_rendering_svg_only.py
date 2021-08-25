@@ -34,7 +34,7 @@ def convert_svg2png(svg_file, png_file, resolution = 72):
         out.write(png_image)
 
 def convert_svg2png2(svg_file, png_file):
-    import wand.image.Image
+    from wand.image import Image
     with Image(filename=svg_file) as original:
         with original.convert('png') as converted:
             converted.save(filename=png_file) 
