@@ -18,19 +18,10 @@ pydiffvg.set_print_timing(True)
 
 gamma = 1
 
-def convert_svg2png(svg_file, png_file, resolution = 72):
-    import pyvips
+def convert_svg2png(svg_file, png_file):
+    import cairosvg
+    cairosvg.svg2png(url="/path/to/input.svg", write_to="/tmp/output.png")
 
-    image = pyvips.Image.new_from_file(svg_file, dpi=resolution)
-    image.write_to_file(png_file)
-
-def convert_svg2png2(svg_file, png_file):
-    from wand.image import Image
-    with Image(filename=svg_file) as original:
-        with original.convert('png') as converted:
-            converted.save(filename=png_file) 
-            converted.format = 'svg'  
-            converted.save(filename=png_file+".svg")     
 
 def main(args):
     # Use GPU if available
