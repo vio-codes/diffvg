@@ -117,6 +117,14 @@ def main(args):
         print('iteration:', t)
         points_optim.zero_grad()
         color_optim.zero_grad()
+        scene_args = pydiffvg.RenderFunction.serialize_scene( canvas_width, canvas_height, shapes, shape_groups)
+        img = render(canvas_width, # width
+                     canvas_height, # height
+                     2,   # num_samples_x
+                     2,   # num_samples_y
+                     t,   # seed
+                     None,
+                     *scene_args)
         # Forward pass: render the image.
         pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
                               canvas_width, canvas_height, shapes, shape_groups)
