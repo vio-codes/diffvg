@@ -43,7 +43,6 @@ def main(args):
     #target = torch.nn.functional.interpolate(target, size = [256, 256], mode = 'area')
     canvas_width, canvas_height = target.shape[3], target.shape[2]
     num_paths = args.num_paths
-    max_width = args.max_width
 
     shapes = []
     shape_groups = []
