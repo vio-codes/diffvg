@@ -15,6 +15,7 @@ import skimage.color
 import random
 import argparse
 import math
+import torch.nn as nn
 
 pydiffvg.set_print_timing(True)
 
@@ -111,10 +112,10 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.1)
+    color_optim = torch.optim.Adam(color_vars, lr=1.0)
     begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
     end_optim = torch.optim.Adam(end_vars, lr=1.0)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=1.0)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
@@ -145,11 +146,12 @@ def main(args):
                               canvas_width, canvas_height, shapes, shape_groups)                    
         
         
-        #TODO  dice loss
+        
         smooth = 1 
         intersection = (img * target).sum()                            
         dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)  
-        loss = perception_loss(img, target) + 1- dice
+        criterion = nn.BCELoss()
+        loss = perception_loss(img, target) + 1- dice + criterion(img, target)
         print('render loss:', loss.item())  
         # Backpropagate the gradients.
         loss.backward()
