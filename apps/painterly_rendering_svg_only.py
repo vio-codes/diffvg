@@ -21,13 +21,14 @@ pydiffvg.set_print_timing(True)
 
 gamma = 1
 
+
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
     perception_loss = ttools.modules.LPIPS().to(pydiffvg.get_device())
     #target = torch.from_numpy(skimage.io.imread('imgs/lena.png')).to(torch.float32) / 255.0
     target = torch.from_numpy(skimage.io.imread(
-        args.target)).to(torch.float32) / 255.0   
+        args.target)).to(torch.float32) / 255.0
     target = target.pow(gamma)
     target = target.to(pydiffvg.get_device())
     target = target.unsqueeze(0)
@@ -70,12 +71,13 @@ def main(args):
         gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.random()*canvas_width, random.random()*canvas_height]),
                                            end=torch.tensor(
                                                [random.random()*canvas_width, random.random()*canvas_height]),
-                                           offsets=torch.tensor([0.0, 0.5, 1.0]),
+                                           offsets=torch.tensor(
+                                               [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
-                                                                      [random.random(),
+                                                                     [random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
@@ -87,28 +89,27 @@ def main(args):
                                          fill_color=gradient)
         shape_groups.append(path_group)
 
-
     points_vars = []
     color_vars = []
-    begin_vars =[]
-    end_vars =[]
-    offsets_vars =[]
+    begin_vars = []
+    end_vars = []
+    offsets_vars = []
     for path in shapes:
         path.points.requires_grad = True
         points_vars.append(path.points)
 
     for group in shape_groups:
-            group.fill_color.end.requires_grad = True
-            end_vars.extend([group.fill_color.end])
-            group.fill_color.begin.requires_grad = True
-            begin_vars.extend([group.fill_color.begin])
-            group.fill_color.offsets.requires_grad = True
-            offsets_vars.extend([group.fill_color.offsets])
-            group.fill_color.stop_colors.requires_grad = True
-            color_vars.extend([group.fill_color.stop_colors])
- 
-        
-    scene_args = pydiffvg.RenderFunction.serialize_scene(canvas_width, canvas_height, shapes, shape_groups)
+        group.fill_color.end.requires_grad = True
+        end_vars.extend([group.fill_color.end])
+        group.fill_color.begin.requires_grad = True
+        begin_vars.extend([group.fill_color.begin])
+        group.fill_color.offsets.requires_grad = True
+        offsets_vars.extend([group.fill_color.offsets])
+        group.fill_color.stop_colors.requires_grad = True
+        color_vars.extend([group.fill_color.stop_colors])
+
+    scene_args = pydiffvg.RenderFunction.serialize_scene(
+        canvas_width, canvas_height, shapes, shape_groups)
     render = pydiffvg.RenderFunction.apply
     # Optimize
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
@@ -125,34 +126,35 @@ def main(args):
         end_optim.zero_grad()
         offsets_optim.zero_grad()
 
-        scene_args = pydiffvg.RenderFunction.serialize_scene( canvas_width, canvas_height, shapes, shape_groups)
-        img = render(canvas_width, # width
-                     canvas_height, # height
+        scene_args = pydiffvg.RenderFunction.serialize_scene(
+            canvas_width, canvas_height, shapes, shape_groups)
+        img = render(canvas_width,  # width
+                     canvas_height,  # height
                      2,   # num_samples_x
                      2,   # num_samples_y
                      t,   # seed
                      None,
                      *scene_args)
         # Forward pass: render the image.
-        img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
+        img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
+            img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
         # Save the intermediate render.
-        pydiffvg.imwrite(img.cpu(), 'results/painterly_svg/iter_{}.png'.format(t), gamma=gamma)
+        pydiffvg.imwrite(
+            img.cpu(), 'results/painterly_svg/iter_{}.png'.format(t), gamma=gamma)
         img = img[:, :, :3]
         # Convert img from HWC to NCHW
         img = img.unsqueeze(0)
-        img = img.permute(0, 3, 1, 2) # NHWC -> NCHW
+        img = img.permute(0, 3, 1, 2)  # NHWC -> NCHW
 
         pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
-                              canvas_width, canvas_height, shapes, shape_groups)                    
-        
-        
-        
-        smooth = 1 
-        intersection = (img * target).sum()                            
-        dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)  
+                                      canvas_width, canvas_height, shapes, shape_groups)
+
+        smooth = 1
+        intersection = (img * target).sum()
+        dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)
         criterion = nn.BCELoss()
-        loss = perception_loss(img, target) + 1- dice + criterion(img, target)
-        print('render loss:', loss.item())  
+        loss = perception_loss(img, target) + 1 - dice + criterion(img, target)
+        print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
 
@@ -166,19 +168,30 @@ def main(args):
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
             group.fill_color.offsets.data.clamp_(0.0, 1.0)
-            group.fill_color.begin[0].data.clamp_(0.0,canvas_width)
-            group.fill_color.begin[1].data.clamp_(0.0,canvas_height)
-            group.fill_color.end[0].data.clamp_(0.0,canvas_width)
-            group.fill_color.end[1].data.clamp_(0.0,canvas_height)
+            group.fill_color.begin[0].data.clamp_(0.0, canvas_width)
+            group.fill_color.begin[1].data.clamp_(0.0, canvas_height)
+            group.fill_color.end[0].data.clamp_(0.0, canvas_width)
+            group.fill_color.end[1].data.clamp_(0.0, canvas_height)
         for path in shapes:
             path.points.requires_grad = True
-            path.points[:, 0].data.clamp_(0.0,canvas_width)
+            path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
-               
 
         # Render the final result
-    pydiffvg.save_svg('/content/final.svg',
-                      canvas_width, canvas_height, shapes, shape_groups)
+    img = render(canvas_width,  # width
+                 canvas_height,  # height
+                 2,   # num_samples_x
+                 2,   # num_samples_y
+                 t,   # seed
+                 None,
+                 *scene_args)
+    # Forward pass: render the image.
+    img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
+        img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
+    # Save the intermediate render.
+    pydiffvg.imwrite(img.cpu(), "/content/final.png", gamma=gamma)
+    pydiffvg.save_ln_gradient_svg('/content/final.svg',
+                                  canvas_width, canvas_height, shapes, shape_groups)
 
 
 if __name__ == "__main__":
