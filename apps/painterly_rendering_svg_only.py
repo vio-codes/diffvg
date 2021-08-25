@@ -20,7 +20,7 @@ gamma = 1
 
 def convert_svg2png(svg_file, png_file):
     import cairosvg
-    cairosvg.svg2png(url="/path/to/input.svg", write_to="/tmp/output.png")
+    cairosvg.svg2png(url=svg_file, write_to=png_file)
 
 
 def main(args):
