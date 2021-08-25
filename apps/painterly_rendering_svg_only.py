@@ -107,9 +107,6 @@ def main(args):
                                          fill_color=gradient)
         shape_groups.append(path_group)
 
-    scene_args = pydiffvg.RenderFunction.serialize_scene(
-        canvas_width, canvas_height, shapes, shape_groups)
-
 
     points_vars = []
     color_vars = []
@@ -136,9 +133,7 @@ def main(args):
         points_optim.zero_grad()
         color_optim.zero_grad()
         # Forward pass: render the image.
-        scene_args = pydiffvg.RenderFunction.serialize_scene(
-            canvas_width, canvas_height, shapes, shape_groups)
-        pydiffvg.save_svg('results/painterly_svg/iter_{}.svg'.format(t),
+        pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
                               canvas_width, canvas_height, shapes, shape_groups)
         convert_svg2png2('results/painterly_svg/iter_{}.svg'.format(t),'results/painterly_svg/iter_{}.png'.format(t))                      
         #TODO  dice loss

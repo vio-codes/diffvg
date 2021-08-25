@@ -3,6 +3,8 @@ import pydiffvg
 import xml.etree.ElementTree as etree
 from xml.dom import minidom
 import os
+import svgwrite
+
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
@@ -11,7 +13,55 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
-def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
+
+def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
+    dwg = svgwrite.Drawing(filename, size=(
+        width, height), profile='full', debug=True)
+    for i, shape_group in enumerate(shape_groups):
+        # color for the blob
+        shape = shapes[shape_group.shape_ids[0]]
+        color = shape_group.fill_color
+        offsets = offsets.offsets.data.cpu().numpy()
+        stop_colors = color.stop_colors.data.cpu().numpy()
+        linear_gradient = dwg.linearGradient((color.begin[0].item(
+        ), color.begin[1].item()), (color.end[0].item(), color.end[1].item()))
+        dwg.defs.add(linear_gradient)
+        for j in range(offsets.shape[0]):
+            c = stop_colors[j, :]
+            linear_gradient.add_stop_color(offset=str(offsets[j]), color=svgwrite.utils.rgb(
+                r=int(255 * c[0]), g=int(255 * c[1]), b=int(255 * c[2]), mode='RGB'), opacity=c[3])
+
+         # path for the blob
+        num_segments = shape.num_control_points.shape[0]
+        num_control_points = shape.num_control_points.data.cpu().numpy()
+        points = shape.points.data.cpu().numpy()
+        num_points = shape.points.shape[0]
+        path_str = 'M {} {}'.format(points[0, 0], points[0, 1])
+        point_id = 1
+        for j in range(0, num_segments):
+            if num_control_points[j] == 0:
+                p = point_id % num_points
+                path_str += ' L {} {}'.format(
+                    points[p, 0], points[p, 1])
+                point_id += 1
+            elif num_control_points[j] == 1:
+                p1 = (point_id + 1) % num_points
+                path_str += ' Q {} {} {} {}'.format(
+                    points[point_id, 0], points[point_id, 1],
+                    points[p1, 0], points[p1, 1])
+                point_id += 2
+            elif num_control_points[j] == 2:
+                p2 = (point_id + 2) % num_points
+                path_str += ' C {} {} {} {} {} {}'.format(
+                    points[point_id, 0], points[point_id, 1],
+                    points[point_id + 1, 0], points[point_id + 1, 1],
+                    points[p2, 0], points[p2, 1])
+                point_id += 3
+        dwg.add(dwg.path(path_str, fill=linear_gradient.get_paint_server(default='currentColor')))   
+    dwg.save()         
+
+
+def save_svg(filename, width, height, shapes, shape_groups, use_gamma=False):
     root = etree.Element('svg')
     root.set('version', '1.1')
     root.set('xmlns', 'http://www.w3.org/2000/svg')
@@ -63,7 +113,8 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
                     stop = etree.SubElement(color, 'stop')
                     stop.set('offset', str(offsets[j]))
                     c = stop_colors[j, :]
-                    stop.set('stop-color', 'rgb({}, {}, {})'.format(int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
+                    stop.set('stop-color', 'rgb({}, {}, {})'.format(int(255 *
+                             c[0]), int(255 * c[1]), int(255 * c[2])))
                     stop.set('stop-opacity', '{}'.format(c[3]))
 
         if shape_group.fill_color is not None:
@@ -85,7 +136,7 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
             for j in range(0, shape.points.shape[0]):
                 path_str += '{} {}'.format(points[j, 0], points[j, 1])
                 if j != shape.points.shape[0] - 1:
-                    path_str +=  ' '
+                    path_str += ' '
             shape_node.set('points', path_str)
         elif isinstance(shape, pydiffvg.Path):
             shape_node = etree.SubElement(g, 'path')
@@ -98,39 +149,42 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
             for j in range(0, num_segments):
                 if num_control_points[j] == 0:
                     p = point_id % num_points
-                    path_str += ' L {} {}'.format(\
-                            points[p, 0], points[p, 1])
+                    path_str += ' L {} {}'.format(
+                        points[p, 0], points[p, 1])
                     point_id += 1
                 elif num_control_points[j] == 1:
                     p1 = (point_id + 1) % num_points
-                    path_str += ' Q {} {} {} {}'.format(\
-                            points[point_id, 0], points[point_id, 1],
-                            points[p1, 0], points[p1, 1])
+                    path_str += ' Q {} {} {} {}'.format(
+                        points[point_id, 0], points[point_id, 1],
+                        points[p1, 0], points[p1, 1])
                     point_id += 2
                 elif num_control_points[j] == 2:
                     p2 = (point_id + 2) % num_points
-                    path_str += ' C {} {} {} {} {} {}'.format(\
-                            points[point_id, 0], points[point_id, 1],
-                            points[point_id + 1, 0], points[point_id + 1, 1],
-                            points[p2, 0], points[p2, 1])
+                    path_str += ' C {} {} {} {} {} {}'.format(
+                        points[point_id, 0], points[point_id, 1],
+                        points[point_id + 1, 0], points[point_id + 1, 1],
+                        points[p2, 0], points[p2, 1])
                     point_id += 3
             shape_node.set('d', path_str)
         elif isinstance(shape, pydiffvg.Rect):
             shape_node = etree.SubElement(g, 'rect')
             shape_node.set('x', shape.p_min[0].item())
             shape_node.set('y', shape.p_min[1].item())
-            shape_node.set('width', shape.p_max[0].item() - shape.p_min[0].item())
-            shape_node.set('height', shape.p_max[1].item() - shape.p_min[1].item())
+            shape_node.set(
+                'width', shape.p_max[0].item() - shape.p_min[0].item())
+            shape_node.set(
+                'height', shape.p_max[1].item() - shape.p_min[1].item())
         else:
             assert(False)
 
-        shape_node.set('stroke-width', str(2 * shape.stroke_width.data.cpu().item()))
+        shape_node.set(
+            'stroke-width', str(2 * shape.stroke_width.data.cpu().item()))
         if shape_group.fill_color is not None:
             if isinstance(shape_group.fill_color, pydiffvg.LinearGradient):
                 shape_node.set('fill', 'url(#shape_{}_fill)'.format(i))
             else:
                 c = shape_group.fill_color.data.cpu().numpy()
-                shape_node.set('fill', 'rgb({}, {}, {})'.format(\
+                shape_node.set('fill', 'rgb({}, {}, {})'.format(
                     int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
                 shape_node.set('opacity', str(c[3]))
         else:
@@ -140,12 +194,12 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
                 shape_node.set('stroke', 'url(#shape_{}_stroke)'.format(i))
             else:
                 c = shape_group.stroke_color.data.cpu().numpy()
-                shape_node.set('stroke', 'rgb({}, {}, {})'.format(\
+                shape_node.set('stroke', 'rgb({}, {}, {})'.format(
                     int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
                 shape_node.set('stroke-opacity', str(c[3]))
             shape_node.set('stroke-linecap', 'round')
             shape_node.set('stroke-linejoin', 'round')
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w") as f:
-        f.write(prettify(root))  
+        f.write(prettify(root))
         f.close()
