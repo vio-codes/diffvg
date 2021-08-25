@@ -145,8 +145,6 @@ def main(args):
         
         
         #TODO  dice loss
-        img = torch.flatten(img)
-        target = torch.flatten(target)
         smooth = 1 
         intersection = (img * target).sum()                            
         dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)  
