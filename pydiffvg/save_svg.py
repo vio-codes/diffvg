@@ -151,3 +151,4 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
 
     with open(filename, "w") as f:
         f.write(prettify(root))
+    return root    
