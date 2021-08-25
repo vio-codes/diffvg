@@ -150,5 +150,4 @@ def save_svg(filename, width, height, shapes, shape_groups, use_gamma = False):
             shape_node.set('stroke-linejoin', 'round')
 
     with open(filename, "w") as f:
-        f.write(prettify(root))
-    return root    
+        f.write(prettify(root))  
