@@ -57,7 +57,7 @@ def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
                     points[point_id + 1, 0], points[point_id + 1, 1],
                     points[p2, 0], points[p2, 1])
                 point_id += 3
-        dwg.add(dwg.path(path_str, fill=linear_gradient.get_paint_server(default='currentColor')))
+        dwg.add(dwg.path(path_str, stroke='none', fill=linear_gradient.get_paint_server()))
     os.makedirs(os.path.dirname(filename), exist_ok=True)       
     dwg.save()         
 
