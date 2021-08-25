@@ -30,8 +30,7 @@ def main(args):
 
     #target = torch.from_numpy(skimage.io.imread('imgs/lena.png')).to(torch.float32) / 255.0
     target = torch.from_numpy(skimage.io.imread(
-        args.target)).to(torch.float32) / 255.0
-    print("Target initial size", target.size())    
+        args.target)).to(torch.float32) / 255.0   
     target = target.pow(gamma)
     target = target.to(pydiffvg.get_device())
     target = target.unsqueeze(0)
@@ -125,15 +124,13 @@ def main(args):
         image = skimage.io.imread('results/painterly_svg/iter_{}.png'.format(t))
         image = skimage.color.rgba2rgb(image)
         img = torch.from_numpy(image).to(torch.float32) / 255.0
-        print("img shape:",img.size())
         img= img.pow(gamma)
         img = img.to(pydiffvg.get_device())
         img = img.unsqueeze(0)
         img = img.permute(0, 3, 1, 2)
 
         loss = (img - target).pow(2).mean()
-        print('render loss:', loss.item())
-
+    
         # Backpropagate the gradients.
         loss.backward()
 
