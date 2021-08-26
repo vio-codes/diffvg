@@ -144,9 +144,9 @@ def main(args):
 
         image_features = clip_utils.embed_image(img)
         
-        #IoU loss
-        inputs = torch.cos(torch.flatten(image_features))
-        targets = torch.cos(torch.flatten(text_features))
+        #IoU losl
+        inputs = torch.flatten(image_features)
+        targets = torch.flatten(text_features)
         
         #intersection is equivalent to True Positive count
         #union is the mutually inclusive area of all labels & predictions 
@@ -161,7 +161,8 @@ def main(args):
         #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
         # torch.cosine_similarity(image_features, text_features, dim=-1).mean()
 
-        loss = 1 - dice
+        #loss = 1 - dice
+        loss = (image_features - text_features.pow(2).mean()
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
