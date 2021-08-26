@@ -142,7 +142,8 @@ def main(args):
         img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
             img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
         # Save the intermediate render.
-        pydiffvg.imwrite(
+        if t % 10 == 0 or t == args.num_iter - 1:
+            pydiffvg.imwrite(
             img.cpu(), 'results/painterly_svg/iter_{}.png'.format(t), gamma=gamma)
         img = img[:, :, :3]
         # Convert img from HWC to NCHW
@@ -152,8 +153,8 @@ def main(args):
         pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
 
-        perc_loss = perception_loss(img, target)
-        cos_loss =  (torch.cos(img) - torch.cos(target)).pow(2).mean()* 100
+        perc_loss = perception_loss(img, target)*10
+        cos_loss =  (torch.cos(img) - torch.cos(target)).pow(2).mean()*100
         print("Losses per:", perc_loss.item(),  "cos", cos_loss.item())
         loss = perc_loss + cos_loss
         print('render loss:', loss.item())
