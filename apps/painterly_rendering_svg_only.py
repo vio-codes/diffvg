@@ -155,16 +155,13 @@ def main(args):
         smooth = 1
         intersection = (img * target).sum()
         dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)
-        bce_criterion = nn.BCELoss()
         cos_criterion = torch.nn.CosineEmbeddingLoss()
         perc_loss = perception_loss(img, target)
         dice_loss = 1 - dice
-        bce_loss = bce_criterion(img, target)
-        ones = Variable(torch.Tensor(img.size(0)).cuda().fill_(1.0))
+        ones = torch.ones(img.size())
         cos_loss = cos_criterion(img, target, ones)
-        print("Losses per:", perc_loss.item(), "dice:", dice_loss.item(),
-              "bce:", bce_loss.item(), "cos", cos_loss.item())
-        loss = perc_loss + dice_loss + bce_loss + cos_loss
+        print("Losses per:", perc_loss.item(), "dice:", dice_loss.item(), "cos", cos_loss.item())
+        loss = perc_loss + dice_loss + cos_loss
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
