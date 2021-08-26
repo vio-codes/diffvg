@@ -144,9 +144,8 @@ def main(args):
 
         image_features = clip_utils.embed_image(img)
         
-        mse_loss = nn.CrossEntropyLoss()
         #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
-        loss = mse_loss(image_features,text_features)
+        loss = 1 - torch.cosine_similarity(image_features, text_features, dim=-1).mean()
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
