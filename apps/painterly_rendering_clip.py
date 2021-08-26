@@ -144,8 +144,22 @@ def main(args):
 
         image_features = clip_utils.embed_image(img)
         
+        #IoU loss
+        inputs = torch.cos(image_features.view(-1))
+        targets = torch.cos(text_features.view(-1))
+        
+        #intersection is equivalent to True Positive count
+        #union is the mutually inclusive area of all labels & predictions 
+        intersection = (inputs * targets).sum()
+        total = (inputs + targets).sum()
+        union = total - intersection 
+        smooth = 1
+        IoU = (intersection + smooth)/(union + smooth)
+                
         #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
-        loss = 1 - torch.cosine_similarity(image_features, text_features, dim=-1).mean()
+        # torch.cosine_similarity(image_features, text_features, dim=-1).mean()
+
+        loss = 1 - IoU
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
