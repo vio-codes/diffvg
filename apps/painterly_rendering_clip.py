@@ -16,11 +16,34 @@ import random
 import argparse
 import math
 import torch.nn as nn
+from torch.nn import functional as F
 from torch.autograd import Variable
 import clip_utils
 pydiffvg.set_print_timing(True)
 
 gamma = 1
+
+def spherical_dist_loss(inputs, targets):
+    inputs = F.normalize(inputs, dim=-1)
+    targets = F.normalize(targets, dim=-1)
+    return (inputs - targets).norm(dim=-1).div(2).arcsin().pow(2).mul(2)
+
+def cos_loss(inputs, targets, y = 1):
+    inputs = inputs.reshape(1,-1)
+    targets = targets.reshape(1,-1)
+    y = y * torch.ones_like(inputs[0])
+    cos_loss = F.cosine_embedding_loss(inputs, targets, y)
+    return cos_loss
+
+def dice_loss(inputs, targets, smooth=1):
+    inputs = F.normalize(inputs, dim=-1)
+    targets = F.normalize(targets, dim=-1)
+        
+    intersection = (inputs * targets).sum()                            
+    dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
+        
+    return 1 - dice
+
 
 
 def main(args):
@@ -143,12 +166,9 @@ def main(args):
                                       canvas_width, canvas_height, shapes, shape_groups)
 
         image_features = clip_utils.embed_image(img)
-        
-           
-        #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
-        coss_loss= 1-torch.cosine_similarity(image_features, text_features, dim=-1).mean()
+    
 
-        loss = coss_loss 
+        loss = cos_loss(image_features, text_features) + dice_loss(image_features, text_features)
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
