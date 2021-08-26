@@ -141,7 +141,7 @@ def main(args):
 
         pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
-
+        img = skimage.color.rgba2rgb(img)
         image_features = clip_utils.embed_image(img)
         
         #Dice loss
