@@ -155,11 +155,13 @@ def main(args):
         union = total - intersection 
         smooth = 1
         IoU = (intersection + smooth)/(union + smooth)
+        #dice                  
+        dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
                 
         #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
         # torch.cosine_similarity(image_features, text_features, dim=-1).mean()
 
-        loss = 1 - IoU
+        loss = 1 - dice
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
