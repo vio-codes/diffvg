@@ -68,9 +68,12 @@ def main(args):
                              stroke_width=torch.tensor(1.0),
                              is_closed=True)
         shapes.append(path)
-        gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.random()*canvas_width, random.random()*canvas_height]),
-                                           end=torch.tensor(
-                                               [random.random()*canvas_width, random.random()*canvas_height]),
+        x_max = torch.max(path.points[:, 0])
+        x_min = torch.min(path.points[:, 0])
+        y_max = torch.max(path.points[:, 1])
+        y_min = torch.min(path.points[:, 1])
+        gradient = pydiffvg.LinearGradient(begin=torch.tensor([x_min, y_min]),
+                                           end=torch.tensor([x_max,y_max]),
                                            offsets=torch.tensor(
                                                [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
@@ -113,10 +116,10 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
-    color_optim = torch.optim.Adam(color_vars, lr=1.0)
+    color_optim = torch.optim.Adam(color_vars, lr=0.01)
     begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
     end_optim = torch.optim.Adam(end_vars, lr=1.0)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=1.0)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=.001)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
@@ -167,7 +170,9 @@ def main(args):
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
-            group.fill_color.offsets.data.clamp_(0.0, 1.0)
+            group.fill_color.offsets[0].data.clamp_(0.0, 0.33)
+            group.fill_color.offsets[1].data.clamp_(0.33, 0.66)
+            group.fill_color.offsets[2].data.clamp_(0.66, 1.0)
             group.fill_color.begin[0].data.clamp_(0.0, canvas_width)
             group.fill_color.begin[1].data.clamp_(0.0, canvas_height)
             group.fill_color.end[0].data.clamp_(0.0, canvas_width)
