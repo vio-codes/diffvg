@@ -152,14 +152,10 @@ def main(args):
         pydiffvg.save_ln_gradient_svg('results/painterly_svg/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
 
-        smooth = 1
-        intersection = (img * target).sum()
-        dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)
         perc_loss = perception_loss(img, target)
-        dice_loss = 1 - dice
-        cos_loss =  (torch.cos(img) - torch.cos(target)).pow(2).mean()
-        print("Losses per:", perc_loss.item(), "dice:", dice_loss.item(), "cos", cos_loss.item())
-        loss = perc_loss + dice_loss + cos_loss
+        cos_loss =  (torch.cos(img) - torch.cos(target)).pow(2).mean()* 100
+        print("Losses per:", perc_loss.item(),  "cos", cos_loss.item())
+        loss = perc_loss + cos_loss
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
