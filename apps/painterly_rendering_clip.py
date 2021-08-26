@@ -140,10 +140,6 @@ def main(args):
         if t % 10 == 0 or t == args.num_iter - 1:
             pydiffvg.imwrite(
             img.cpu(), 'results/painterly_clip/iter_{}.png'.format(t), gamma=gamma)
-        img = img[:, :, :3]
-        # Convert img from HWC to NCHW
-        img = img.unsqueeze(0)
-        img = img.permute(0, 3, 1, 2)  # NHWC -> NCHW
 
         pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
