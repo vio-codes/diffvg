@@ -73,7 +73,7 @@ def main(args):
         y_max = torch.max(path.points[:, 1])
         y_min = torch.min(path.points[:, 1])
         gradient = pydiffvg.LinearGradient(begin=torch.tensor([x_min, y_min]),
-                                           end=torch.tensor([x_max,y_max]),
+                                           end=torch.tensor([x_max, y_max]),
                                            offsets=torch.tensor(
                                                [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
@@ -155,12 +155,15 @@ def main(args):
         smooth = 1
         intersection = (img * target).sum()
         dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)
-        criterion = nn.BCELoss()
-        perc_loss =  perception_loss(img, target)
+        bce_criterion = nn.BCELoss()
+        cos_criterion = torch.nn.CosineEmbeddingLoss()
+        perc_loss = perception_loss(img, target)
         dice_loss = 1 - dice
-        bce_loss =criterion(img, target)
-        print("Losses per:",perc_loss,"dice:",dice_loss,"bce:",bce_loss)
-        loss = perc_loss + dice_loss + bce_loss
+        bce_loss = bce_criterion(img, target)
+        cos_loss = cos_criterion(img, target, 1)
+        print("Losses per:", perc_loss.item(), "dice:", dice_loss.item(),
+              "bce:", bce_loss.item(), "cos", cos_loss.item())
+        loss = perc_loss + dice_loss + bce_loss + cos_loss
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
@@ -204,8 +207,9 @@ def main(args):
     if args.debug:
         from subprocess import call
         call(["ffmpeg", "-framerate", "24", "-i",
-        "results/painterly_svg/iter_%d.png", "-vb", "20M",
-        "/content/final.mp4"])                              
+              "results/painterly_svg/iter_%d.png", "-c:v", "libx264", "-preset", "veryslow",
+              "-crf", "20", "-vf", "format=yuv420p", "-movflags", "+faststart",
+              "/content/final.mp4"])
 
 
 if __name__ == "__main__":
