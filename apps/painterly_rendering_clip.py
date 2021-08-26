@@ -168,7 +168,7 @@ def main(args):
         image_features = clip_utils.embed_image(img)
     
 
-        loss = cos_loss(image_features, text_features) + dice_loss(image_features, text_features)
+        loss = cos_loss(image_features, text_features) + spherical_dist_loss(image_features, text_features)
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
