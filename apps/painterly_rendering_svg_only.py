@@ -159,7 +159,7 @@ def main(args):
         perc_loss = perception_loss(img, target)
         dice_loss = 1 - dice
         ones = torch.ones(img.size())
-        cos_loss = cos_criterion(img, target, ones)
+        cos_loss = cos_criterion(torch.flatten(img), torch.flatten(target), torch.flatten(ones))
         print("Losses per:", perc_loss.item(), "dice:", dice_loss.item(), "cos", cos_loss.item())
         loss = perc_loss + dice_loss + cos_loss
         print('render loss:', loss.item())
