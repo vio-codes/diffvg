@@ -145,8 +145,8 @@ def main(args):
         image_features = clip_utils.embed_image(img)
         
         #IoU loss
-        inputs = torch.flatten(image_features)
-        targets = torch.flatten(text_features)
+        inputs = torch.cos(torch.flatten(image_features))
+        targets = torch.cos(torch.flatten(text_features))
         
         #intersection is equivalent to True Positive count
         #union is the mutually inclusive area of all labels & predictions 
