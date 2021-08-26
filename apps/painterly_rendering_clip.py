@@ -133,10 +133,10 @@ def main(args):
                      t,   # seed
                      None,
                      *scene_args)
-                     
+
         # Save the intermediate render.
-        if t % 10 == 0 or t == args.num_iter - 1:
-            pydiffvg.imwrite(
+       
+        pydiffvg.imwrite(
             img.cpu(), 'results/painterly_clip/iter_{}.png'.format(t), gamma=gamma)
 
         pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
