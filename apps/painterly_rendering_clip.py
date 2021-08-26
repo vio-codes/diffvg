@@ -159,10 +159,11 @@ def main(args):
         dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
                 
         #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
-        # torch.cosine_similarity(image_features, text_features, dim=-1).mean()
+        coss_loss= 1-torch.cosine_similarity(image_features, text_features, dim=-1).mean()
 
-        #loss = 1 - dice
-        loss = (image_features - text_features).pow(2).mean()
+        dice_loss = 1 - dice.pow(2)
+        mse_loss  = (image_features - text_features).pow(2).mean()
+        loss = dice_loss +mse_loss
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
