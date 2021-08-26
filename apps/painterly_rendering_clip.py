@@ -162,8 +162,9 @@ def main(args):
         coss_loss= 1-torch.cosine_similarity(image_features, text_features, dim=-1).mean()
 
         dice_loss = 1 - dice.pow(2)
+        
         mse_loss  = (image_features - text_features).pow(2).mean()
-        loss = dice_loss +mse_loss
+        loss = coss_loss +mse_loss
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
