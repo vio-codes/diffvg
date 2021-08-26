@@ -156,7 +156,11 @@ def main(args):
         intersection = (img * target).sum()
         dice = (2.*intersection + smooth)/(img.sum() + target.sum() + smooth)
         criterion = nn.BCELoss()
-        loss = perception_loss(img, target) + 1 - dice 
+        perc_loss =  perception_loss(img, target)
+        dice_loss = 1 - dice
+        bce_loss =criterion(img, target)
+        print("Losses per:",perc_loss,"dice:",dice_loss,"bce:",bce_loss)
+        loss = perc_loss + dice_loss + bce_loss
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
@@ -197,6 +201,11 @@ def main(args):
     pydiffvg.imwrite(img.cpu(), "/content/final.png", gamma=gamma)
     pydiffvg.save_ln_gradient_svg('/content/final.svg',
                                   canvas_width, canvas_height, shapes, shape_groups)
+    if args.debug:
+        from subprocess import call
+        call(["ffmpeg", "-framerate", "24", "-i",
+        "results/painterly_svg/iter_%d.png", "-vb", "20M",
+        "/content/final.mp4"])                              
 
 
 if __name__ == "__main__":
@@ -204,5 +213,6 @@ if __name__ == "__main__":
     parser.add_argument("target", help="target image path")
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
+    parser.add_argument("--debug", dest='debug', action='store_true')
     args = parser.parse_args()
     main(args)
