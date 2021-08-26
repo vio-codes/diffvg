@@ -144,16 +144,10 @@ def main(args):
 
         image_features = clip_utils.embed_image(img)
         
-        #Dice loss
-        smooth = 1
-        intersection = (image_features * text_features).sum()                            
-        dice = (2.*intersection + smooth)/(image_features.sum() + text_features.sum() + smooth)  
-        dice_loss =  1 - dice
-        #Cos loss
-        cos_loss = (torch.cos(image_features) - torch.cos(text_features)).pow(2).mean()*100
+        mse_loss = nn.MSELoss()
         #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
-        loss = cos_loss
-        print('render loss:', loss.item(),"dice:",dice_loss.item(),"cos:",cos_loss.item())
+        loss = mse_loss(image_features,text_features)
+        print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
 
