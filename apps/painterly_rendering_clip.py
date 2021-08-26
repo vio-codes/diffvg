@@ -110,7 +110,7 @@ def main(args):
         canvas_width, canvas_height, shapes, shape_groups)
     render = pydiffvg.RenderFunction.apply
     # Optimize
-    points_optim = torch.optim.Adam(points_vars, lr=1.0)
+    points_optim = torch.optim.Adam(points_vars, lr=2.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.01)
     begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
     end_optim = torch.optim.Adam(end_vars, lr=1.0)
@@ -144,27 +144,11 @@ def main(args):
 
         image_features = clip_utils.embed_image(img)
         
-        #IoU losl
-        inputs = torch.flatten(image_features)
-        targets = torch.flatten(text_features)
-        
-        #intersection is equivalent to True Positive count
-        #union is the mutually inclusive area of all labels & predictions 
-        intersection = (inputs * targets).sum()
-        total = (inputs + targets).sum()
-        union = total - intersection 
-        smooth = 1
-        IoU = (intersection + smooth)/(union + smooth)
-        #dice                  
-        dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
-                
+           
         #loss = -torch.cosine_similarity(text_features, image_features, dim=-1).mean()
         coss_loss= 1-torch.cosine_similarity(image_features, text_features, dim=-1).mean()
 
-        dice_loss = 1 - dice.pow(2)
-        
-        mse_loss  = (image_features - text_features).pow(2).mean()
-        loss = coss_loss +mse_loss
+        loss = coss_loss 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
