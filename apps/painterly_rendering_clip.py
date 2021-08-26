@@ -133,9 +133,7 @@ def main(args):
                      t,   # seed
                      None,
                      *scene_args)
-        # Forward pass: render the image.
-        img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
-            img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
+                     
         # Save the intermediate render.
         if t % 10 == 0 or t == args.num_iter - 1:
             pydiffvg.imwrite(
