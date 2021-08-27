@@ -180,13 +180,24 @@ def main(args):
         canvas_width, canvas_height, shapes, shape_groups)
     render = pydiffvg.RenderFunction.apply
     # Optimize
-    
+    gamma =0.9
+    step_size =100
     points_optim = torch.optim.Adam(points_vars, lr=10.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.01)
-    begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
-    end_optim = torch.optim.Adam(end_vars, lr=1.0)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
-    scheduler = torch.optim.lr_scheduler.StepLR(points_optim, step_size=100, gamma=0.9)
+    color_optim = torch.optim.Adam(color_vars, lr=1.0)
+    begin_optim = torch.optim.Adam(begin_vars, lr=10.0)
+    end_optim = torch.optim.Adam(end_vars, lr=10.0)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=1.0)
+    schedulers =[]
+    points_scheduler = torch.optim.lr_scheduler.StepLR(points_optim, step_size=step_size, gamma=gamma)
+    schedulers.append(points_scheduler)
+    color_scheduler = torch.optim.lr_scheduler.StepLR(color_optim, step_size=step_size, gamma=gamma)
+    schedulers.append(color_scheduler)
+    begin_scheduler = torch.optim.lr_scheduler.StepLR(begin_optim, step_size=step_size, gamma=gamma)
+    schedulers.append(begin_scheduler)
+    end_scheduler = torch.optim.lr_scheduler.StepLR(end_optim, step_size=step_size, gamma=gamma)
+    schedulers.append(end_scheduler)
+    offsets_scheduler = torch.optim.lr_scheduler.StepLR(offsets_optim, step_size=step_size, gamma=gamma)
+    schedulers.append(offsets_scheduler)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
@@ -244,7 +255,8 @@ def main(args):
         begin_optim.step()
         end_optim.step()
         offsets_optim.step()
-        scheduler.step()
+        for scheduler in schedulers:
+            scheduler.step()
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
