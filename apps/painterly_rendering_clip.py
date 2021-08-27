@@ -155,6 +155,8 @@ def main(args):
     augment_trans = transforms.Compose([
     transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.RandomResizedCrop(224, scale=(0.7,0.9)),
+    transforms.RandomRotation(degrees=(0, 180)),
+    transforms.ColorJitter(brightness=.5, hue=.3),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))])
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
