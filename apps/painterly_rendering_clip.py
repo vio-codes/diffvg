@@ -24,17 +24,11 @@ pydiffvg.set_print_timing(True)
 gamma = 1
 
 def random_scale(path, canvas_width, canvas_height):
-    x =  path.points[:, 0]
-    y =  path.points[:, 1]
     scale= random.random()*2
-    x_center = torch.mean(x)
-    y_center = torch.mean(y)
-    x_prim = x - x_center
-    y_prim = y - y_center 
-    x_scaled = x + x_prim*scale
-    y_scaled = y+ y_prim*scale
-    path.points[:, 0] = x_scaled.data.clamp_(0.0, canvas_width)
-    path.points[:, 1] = y_scaled.data.clamp_(0.0, canvas_height)
+    path.points[:, 0] = path.points[:, 0] + (path.points[:, 0] - path.points[:, 0].mean())*scale 
+    path.points[:, 1] = path.points[:, 1] + (path.points[:, 1] - path.points[:, 1].mean())*scale 
+    path.points[:, 0].data.clamp_(0.0, canvas_width)
+    path.points[:, 1].data.clamp_(0.0, canvas_height)
     return path
 
 
