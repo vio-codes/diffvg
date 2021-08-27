@@ -36,6 +36,10 @@ def rgba_to_rgb(rgba_image):
     # TODO: Try just taking the first 3 channels
     return rgba_image[:, :, 3:4] * rgba_image[:, :, :3] + torch.ones(rgba_image.shape[0], rgba_image.shape[1], 3, device=DEVICE) * (1 - rgba_image[:, :, 3:4])
 
+def simple_img_embed(image):
+    image_features_vit = clip_model_vit.encode_image(image)  # [1, 512]
+    image_features_rn = clip_model_rn.encode_image(image)  # [1, 512]
+    return torch.cat([image_features_vit, image_features_rn], dim=-1)
 
 def embed_image(image):
     # Convert and normalize image

@@ -19,6 +19,10 @@ import torch.nn as nn
 from torch.nn import functional as F
 from torch.autograd import Variable
 import clip_utils
+
+import torchvision
+import torchvision.transforms as transforms
+
 pydiffvg.set_print_timing(True)
 
 gamma = 1
@@ -53,6 +57,7 @@ def dice_loss(inputs, targets, smooth=1):
         
     return 1 - dice
 
+@torch.no_grad()
 def generate_blobs(num_paths, canvas_width, canvas_height):
     shapes = []
     shape_groups = []
@@ -133,6 +138,7 @@ def generate_vars(shapes, shape_groups):
 
     return points_vars, color_vars, begin_vars, end_vars ,offsets_vars    
 
+@torch.no_grad()
 def load_targets(targets):
     embed = []
     targets = [phrase.strip() for phrase in targets.split("|")]
@@ -146,7 +152,9 @@ def load_targets(targets):
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
-
+    augment_trans = transforms.Compose([
+    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    transforms.RandomResizedCrop(224, scale=(0.7,0.9))])
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
 
@@ -205,23 +213,32 @@ def main(args):
                      *scene_args)
 
         # Save the intermediate render.
-       
+        img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
         pydiffvg.imwrite(
             img.cpu(), 'results/painterly_clip/iter_{}.png'.format(t), gamma=gamma)
 
         pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
+        img = img[:, :, :3]
+        img = img.unsqueeze(0)
+        img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
+        
+        loss = 0
+        NUM_AUGS = 4
+        img_augs = []
+        image_features = []
+        for _ in range(NUM_AUGS):
+            img_augs.append(augment_trans(img))
+        for aug in img_augs:
+            image_features.append(clip_utils.simple_img_embed(aug))
 
-        image_features = clip_utils.embed_image(img)
-        poz_loss=[]
-        neg_loss= []
-        for text_feature in poz_text_features:
-            poz_loss.append(cos_loss(image_features, text_feature))
+        for image_feature in image_features:
+            for text_feature in poz_text_features:
+                loss+= cos_loss(image_feature, text_feature)
 
-        for text_feature in neg_text_features:
-            neg_loss.append(cos_loss(image_features, text_feature))    
+            for text_feature in neg_text_features:
+                loss-= cos_loss(image_features, text_feature)    
 
-        loss = sum(poz_loss) - sum(neg_loss)
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
