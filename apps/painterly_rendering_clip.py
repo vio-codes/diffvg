@@ -22,6 +22,7 @@ import clip_utils
 
 import torchvision
 import torchvision.transforms as transforms
+from torchvision.transforms import AutoAugmentPolicy
 
 pydiffvg.set_print_timing(True)
 
