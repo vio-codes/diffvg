@@ -180,7 +180,7 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
     
-    points_optim = torch.optim.SparseAdam(points_vars, lr=100.0)
+    points_optim = torch.optim.Adam(points_vars, lr=100.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.01)
     begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
     end_optim = torch.optim.Adam(end_vars, lr=1.0)
