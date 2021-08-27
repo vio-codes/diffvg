@@ -181,12 +181,12 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
     
-    points_optim = torch.optim.Adam(points_vars, lr=100.0)
+    points_optim = torch.optim.Adam(points_vars, lr=10.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.01)
     begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
     end_optim = torch.optim.Adam(end_vars, lr=1.0)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
-    scheduler = torch.optim.lr_scheduler.StepLR(points_optim, step_size=100, gamma=0.1)
+    scheduler = torch.optim.lr_scheduler.StepLR(points_optim, step_size=100, gamma=0.9)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
@@ -219,7 +219,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0
-        NUM_AUGS = 16
+        NUM_AUGS = 4
         img_augs = []
         image_features = []
         for _ in range(NUM_AUGS):
