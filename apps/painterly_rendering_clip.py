@@ -271,8 +271,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("targets", help="target text")
-    parser.add_argument("negative_targets", help="target text")
+    parser.add_argument("--targets", help="target text")
+    parser.add_argument("--negative_targets", help="target text")
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--debug", dest='debug', action='store_true')
