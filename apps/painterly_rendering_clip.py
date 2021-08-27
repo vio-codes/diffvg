@@ -148,6 +148,7 @@ def main(args):
     transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.RandomRotation(degrees=(0, 180)),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))])
+    
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
 
@@ -218,7 +219,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0
-        NUM_AUGS = 16
+        NUM_AUGS = 8
         img_augs = []
         image_features = []
         for _ in range(NUM_AUGS):
