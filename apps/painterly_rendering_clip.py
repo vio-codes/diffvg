@@ -179,11 +179,13 @@ def main(args):
         canvas_width, canvas_height, shapes, shape_groups)
     render = pydiffvg.RenderFunction.apply
     # Optimize
-    points_optim = torch.optim.Adam(points_vars, lr=5.0)
+    
+    points_optim = torch.optim.SparseAdam(points_vars, lr=100.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.01)
     begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
     end_optim = torch.optim.Adam(end_vars, lr=1.0)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
+    scheduler = torch.optim.lr_scheduler.StepLR(points_optim, step_size=100, gamma=0.1)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
@@ -241,6 +243,7 @@ def main(args):
         begin_optim.step()
         end_optim.step()
         offsets_optim.step()
+        scheduler.step()
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
