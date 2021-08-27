@@ -181,11 +181,11 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
     gamma =0.9
-    step_size =100
+    step_size =10
     points_optim = torch.optim.Adam(points_vars, lr=10.0)
     color_optim = torch.optim.Adam(color_vars, lr=1.0)
-    begin_optim = torch.optim.Adam(begin_vars, lr=10.0)
-    end_optim = torch.optim.Adam(end_vars, lr=10.0)
+    begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
+    end_optim = torch.optim.Adam(end_vars, lr=1.0)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=1.0)
     schedulers =[]
     points_scheduler = torch.optim.lr_scheduler.StepLR(points_optim, step_size=step_size, gamma=gamma)
