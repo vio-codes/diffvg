@@ -22,7 +22,6 @@ import clip_utils
 
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.transforms import AutoAugmentPolicy
 
 pydiffvg.set_print_timing(True)
 
@@ -161,7 +160,7 @@ def main(args):
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))])
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
-    augment_trans_imagenet = transforms.AutoAugment(AutoAugmentPolicy.IMAGENET)
+
 
     canvas_width, canvas_height = 224, 224
     num_paths = args.num_paths
@@ -229,11 +228,11 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0
-        NUM_AUGS = 4
+        NUM_AUGS = 16
         img_augs = []
         image_features = []
         for _ in range(NUM_AUGS):
-            img_augs.append(augment_trans_imagenet(img))
+            img_augs.append(augment_trans(img))
         for aug in img_augs:
             image_features.append(clip_utils.simple_img_embed(aug))
 
