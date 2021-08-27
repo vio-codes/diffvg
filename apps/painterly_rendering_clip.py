@@ -24,13 +24,12 @@ pydiffvg.set_print_timing(True)
 gamma = 1
 
 def random_scale(path, canvas_width, canvas_height):
-    scale= random.random()*2
+    scale= 2
     path.points[:, 0].add((path.points[:, 0] - path.points[:, 0].mean())*scale) 
     path.points[:, 1].add((path.points[:, 1] - path.points[:, 1].mean())*scale) 
     path.points[:, 0].data.clamp_(0.0, canvas_width)
     path.points[:, 1].data.clamp_(0.0, canvas_height)
     return path
-
 
 
 def spherical_dist_loss(inputs, targets):
@@ -181,8 +180,7 @@ def main(args):
         
         #Scale augmentation
         for path in shapes:
-            if args.aug_perc/100 >= random.random():
-                path=random_scale(path, canvas_width, canvas_height)
+            path=random_scale(path, canvas_width, canvas_height)
 
 
         points_optim.zero_grad()
