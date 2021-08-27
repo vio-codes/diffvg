@@ -25,8 +25,8 @@ gamma = 1
 
 def random_scale(path, canvas_width, canvas_height):
     scale= random.random()*2
-    path.points[:, 0] = path.points[:, 0] + (path.points[:, 0] - path.points[:, 0].mean())*scale 
-    path.points[:, 1] = path.points[:, 1] + (path.points[:, 1] - path.points[:, 1].mean())*scale 
+    path.points[:, 0].add((path.points[:, 0] - path.points[:, 0].mean())*scale) 
+    path.points[:, 1].add((path.points[:, 1] - path.points[:, 1].mean())*scale) 
     path.points[:, 0].data.clamp_(0.0, canvas_width)
     path.points[:, 1].data.clamp_(0.0, canvas_height)
     return path
