@@ -44,17 +44,7 @@ def dice_loss(inputs, targets, smooth=1):
         
     return 1 - dice
 
-
-
-def main(args):
-    # Use GPU if available
-    pydiffvg.set_use_gpu(torch.cuda.is_available())
-
-    text_features = clip_utils.embed_text(args.target)
-    #target = torch.nn.functional.interpolate(target, size = [256, 256], mode = 'area')
-    canvas_width, canvas_height = 224, 224
-    num_paths = args.num_paths
-
+def generate_blobs(num_paths, canvas_width, canvas_height):
     shapes = []
     shape_groups = []
 
@@ -110,6 +100,9 @@ def main(args):
                                          fill_color=gradient)
         shape_groups.append(path_group)
 
+    return shapes, shape_groups    
+
+def generate_vars(shapes, shape_groups):
     points_vars = []
     color_vars = []
     begin_vars = []
@@ -128,6 +121,39 @@ def main(args):
         offsets_vars.extend([group.fill_color.offsets])
         group.fill_color.stop_colors.requires_grad = True
         color_vars.extend([group.fill_color.stop_colors])
+
+    return points_vars, color_vars, begin_vars, end_vars ,offsets_vars    
+
+def main(args):
+    # Use GPU if available
+    pydiffvg.set_use_gpu(torch.cuda.is_available())
+
+    text_features = clip_utils.embed_text(args.target)
+    #target = torch.nn.functional.interpolate(target, size = [256, 256], mode = 'area')
+    canvas_width, canvas_height = 224, 224
+    num_paths = args.num_paths
+
+    shapes = []
+    shape_groups = []
+
+    new_shapes, new_shape_groups = generate_blobs(num_paths, canvas_width, canvas_height)
+
+    shapes.extend(new_shapes)
+    shape_groups.extend(new_shape_groups)
+    
+    points_vars = []
+    color_vars = []
+    begin_vars = []
+    end_vars = []
+    offsets_vars = []
+    
+    new_points_vars, new_color_vars, new_begin_vars, new_end_vars, new_offsets_vars = generate_vars(shapes, shape_groups)
+
+    points_vars.extend(new_points_vars)
+    color_vars.extend(new_color_vars)
+    begin_vars.extend(new_begin_vars)
+    end_vars.extend(new_end_vars)
+    offsets_vars.extend(new_offsets_vars)
 
     scene_args = pydiffvg.RenderFunction.serialize_scene(
         canvas_width, canvas_height, shapes, shape_groups)
