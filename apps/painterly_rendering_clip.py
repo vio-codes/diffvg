@@ -216,7 +216,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0
-        NUM_AUGS = 64
+        NUM_AUGS = 16
         img_augs = []
         image_features = []
         for _ in range(NUM_AUGS):
@@ -226,10 +226,10 @@ def main(args):
 
         for image_feature in image_features:
             for text_feature in poz_text_features:
-                loss+= cos_loss(image_feature, text_feature)
+                loss+= cos_loss(image_feature, text_feature) + spherical_dist_loss(image_feature, text_feature)
 
             for text_feature in neg_text_features:
-                loss-= cos_loss(image_feature, text_feature)    
+                loss-= cos_loss(image_feature, text_feature) - spherical_dist_loss(image_feature, text_feature) 
 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
