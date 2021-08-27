@@ -225,8 +225,7 @@ def main(args):
             group.fill_color.end[0].data.clamp_(0.0, canvas_width)
             group.fill_color.end[1].data.clamp_(0.0, canvas_height)
         for path in shapes:
-            path.points[:, 0] = path.points[:, 0].mul(2)
-            path.points[:, 1]= path.points[:, 1].mul(2)
+            path.points *=2
             path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
 
