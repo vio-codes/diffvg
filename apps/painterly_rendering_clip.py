@@ -23,6 +23,22 @@ pydiffvg.set_print_timing(True)
 
 gamma = 1
 
+def random_scale(path, canvas_width, canvas_height):
+    x =  path.points[:, 0]
+    y =  path.points[:, 1]
+    scale= random.random()*2
+    x_center = torch.mean(x)
+    y_center = torch.mean(y)
+    x_prim = x - x_center
+    y_prim = y - y_center 
+    x_scaled = x + x_prim*scale
+    y_scaled = y+ y_prim*scale
+    path.points[:, 0] = x_scaled.data.clamp_(0.0, canvas_width)
+    path.points[:, 1] = y_scaled.data.clamp_(0.0, canvas_height)
+    return path
+
+
+
 def spherical_dist_loss(inputs, targets):
     inputs = F.normalize(inputs, dim=-1)
     targets = F.normalize(targets, dim=-1)
@@ -167,6 +183,14 @@ def main(args):
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
+     
+        
+        #Scale augmentation
+        for path in shapes:
+            if args.aug_perc/100 >= random.random():
+                path=random_scale(path, canvas_width, canvas_height)
+
+
         points_optim.zero_grad()
         color_optim.zero_grad()
         begin_optim.zero_grad()
@@ -216,7 +240,6 @@ def main(args):
             group.fill_color.end[0].data.clamp_(0.0, canvas_width)
             group.fill_color.end[1].data.clamp_(0.0, canvas_height)
         for path in shapes:
-            path.points.requires_grad = True
             path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
 
@@ -249,5 +272,6 @@ if __name__ == "__main__":
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--debug", dest='debug', action='store_true')
+    parser.add_argument("--aug_perc", type=int, default=50)
     args = parser.parse_args()
     main(args)
