@@ -237,7 +237,7 @@ def main(args):
                 loss+= cos_loss(image_feature, text_feature)
 
             for text_feature in neg_text_features:
-                loss-= cos_loss(image_features, text_feature)    
+                loss-= cos_loss(image_feature, text_feature)    
 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
