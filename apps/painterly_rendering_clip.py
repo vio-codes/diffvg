@@ -27,15 +27,6 @@ pydiffvg.set_print_timing(True)
 
 gamma = 1
 
-def random_scale(path, canvas_width, canvas_height):
-    scale= 2
-    path.points[:, 0].add((path.points[:, 0] - path.points[:, 0].mean())*scale) 
-    path.points[:, 1].add((path.points[:, 1] - path.points[:, 1].mean())*scale) 
-    path.points[:, 0].data.clamp_(0.0, canvas_width)
-    path.points[:, 1].data.clamp_(0.0, canvas_height)
-    return path
-
-
 def spherical_dist_loss(inputs, targets):
     inputs = F.normalize(inputs, dim=-1)
     targets = F.normalize(targets, dim=-1)
@@ -153,10 +144,9 @@ def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
     augment_trans = transforms.Compose([
+    transforms.RandomResizedCrop(224, scale=(0.5,0.9)),
     transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9)),
     transforms.RandomRotation(degrees=(0, 180)),
-    transforms.ColorJitter(brightness=.5, hue=.3),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))])
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
