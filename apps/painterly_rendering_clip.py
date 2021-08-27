@@ -133,12 +133,23 @@ def generate_vars(shapes, shape_groups):
 
     return points_vars, color_vars, begin_vars, end_vars ,offsets_vars    
 
+def load_targets(targets):
+    embed = []
+    targets = [phrase.strip() for phrase in targets.split("|")]
+    if targets == ['']:
+        targets = []
+    else:
+        for target in targets:
+            embed.append(clip_utils.embed_text(target))
+    return embed        
+
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
-    text_features = clip_utils.embed_text(args.target)
-    #target = torch.nn.functional.interpolate(target, size = [256, 256], mode = 'area')
+    poz_text_features = load_targets(args.targets)
+    neg_text_features = load_targets(args.negative_targets)
+
     canvas_width, canvas_height = 224, 224
     num_paths = args.num_paths
 
@@ -176,6 +187,7 @@ def main(args):
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
+
         points_optim.zero_grad()
         color_optim.zero_grad()
         begin_optim.zero_grad()
@@ -201,9 +213,15 @@ def main(args):
                                       canvas_width, canvas_height, shapes, shape_groups)
 
         image_features = clip_utils.embed_image(img)
-    
+        poz_loss=[]
+        neg_loss= []
+        for text_feature in poz_text_features:
+            poz_loss.append(cos_loss(image_features, text_feature))
 
-        loss = cos_loss(image_features, text_features)
+        for text_feature in neg_text_features:
+            neg_loss.append(cos_loss(image_features, text_feature))    
+
+        loss = sum(poz_loss) - sum(neg_loss)
         print('render loss:', loss.item())
         # Backpropagate the gradients.
         loss.backward()
@@ -225,7 +243,6 @@ def main(args):
             group.fill_color.end[0].data.clamp_(0.0, canvas_width)
             group.fill_color.end[1].data.clamp_(0.0, canvas_height)
         for path in shapes:
-            path.points *=2
             path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
 
@@ -254,7 +271,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("target", help="target text")
+    parser.add_argument("targets", help="target text")
+    parser.add_argument("negative_targets", help="target text")
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--debug", dest='debug', action='store_true')
