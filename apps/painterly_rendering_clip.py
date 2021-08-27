@@ -144,7 +144,7 @@ def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
     augment_trans = transforms.Compose([
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(6/19, 19/6))])
+    transforms.RandomResizedCrop(224, scale=(0.7,0.9))])
 
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
@@ -216,7 +216,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0
-        NUM_AUGS = 8
+        NUM_AUGS = 5
         img_augs = []
         image_features = []
         for _ in range(NUM_AUGS):
