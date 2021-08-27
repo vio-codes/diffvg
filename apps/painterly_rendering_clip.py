@@ -176,14 +176,6 @@ def main(args):
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
-     
-        
-        #Scale augmentation
-        for path in shapes:
-            path.points[:, 0].data.mul(200)
-            path.points[:, 1].data.mul(200)
-
-
         points_optim.zero_grad()
         color_optim.zero_grad()
         begin_optim.zero_grad()
@@ -233,6 +225,8 @@ def main(args):
             group.fill_color.end[0].data.clamp_(0.0, canvas_width)
             group.fill_color.end[1].data.clamp_(0.0, canvas_height)
         for path in shapes:
+            path.points[:, 0] = path.points[:, 0].mul(2)
+            path.points[:, 1]= path.points[:, 1].mul(2)
             path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
 
