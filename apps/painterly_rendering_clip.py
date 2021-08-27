@@ -180,8 +180,8 @@ def main(args):
         canvas_width, canvas_height, shapes, shape_groups)
     render = pydiffvg.RenderFunction.apply
     # Optimize
-    gamma =0.5
-    step_size =50
+    gamma =0.6
+    step_size =100
     points_optim = torch.optim.Adam(points_vars, lr=10.0)
     color_optim = torch.optim.Adam(color_vars, lr=1.0)
     begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
