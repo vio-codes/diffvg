@@ -180,7 +180,8 @@ def main(args):
         
         #Scale augmentation
         for path in shapes:
-            path=random_scale(path, canvas_width, canvas_height)
+            path.points[:, 0].mul(2)
+            path.points[:, 1].mul(2)
 
 
         points_optim.zero_grad()
