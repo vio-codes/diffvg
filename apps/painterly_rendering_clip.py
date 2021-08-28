@@ -244,7 +244,7 @@ def main(args):
             for text_feature in neg_text_features:
                 loss-= cos_loss(image_feature, text_feature) - spherical_dist_loss(image_feature, text_feature) 
 
-        print('render loss:', loss.item())
+        print('render loss:', loss)
         # Backpropagate the gradients.
         loss.backward()
 
