@@ -229,7 +229,7 @@ def main(args):
         img = img.unsqueeze(0)
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
-        loss = 0
+        loss = 0.0
         NUM_AUGS = 4
         img_augs = []
         image_features = []
