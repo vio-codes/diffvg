@@ -39,10 +39,17 @@ def cos_loss(inputs, targets, y = 1):
     cos_loss = F.cosine_embedding_loss(inputs, targets, y)
     return cos_loss
 
+def triple_loss(inputs ,positives, negatives):
+    inputs = F.normalize(inputs, dim=-1)
+    positives = F.normalize(positives, dim=-1)
+    negatives = F.normalize(negatives, dim=-1)
+    triplet_loss =  nn.TripletMarginWithDistanceLoss(distance_function=nn.nn.CosineSimilarity(dim=-1))
+    output = triplet_loss(inputs, positives, negatives)
+    return output
+
 def dice_loss(inputs, targets, smooth=1):
     inputs = F.normalize(inputs, dim=-1)
-    targets = F.normalize(targets, dim=-1)
-        
+    targets = F.normalize(targets, dim=-1)        
     intersection = (inputs * targets).sum()                            
     dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
         
@@ -179,24 +186,12 @@ def main(args):
         canvas_width, canvas_height, shapes, shape_groups)
     render = pydiffvg.RenderFunction.apply
     # Optimize
-    gamma =0.9
-    step_size =100
-    points_optim = torch.optim.Adam(points_vars, lr=5.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.1)
+
+    points_optim = torch.optim.Adam(points_vars, lr=2.0)
+    color_optim = torch.optim.Adam(color_vars, lr=0.01)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
     end_optim = torch.optim.Adam(end_vars, lr=0.1)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
-    schedulers =[]
-    points_scheduler = torch.optim.lr_scheduler.StepLR(points_optim, step_size=step_size, gamma=gamma)
-    schedulers.append(points_scheduler)
-    color_scheduler = torch.optim.lr_scheduler.StepLR(color_optim, step_size=step_size, gamma=gamma)
-    schedulers.append(color_scheduler)
-    begin_scheduler = torch.optim.lr_scheduler.StepLR(begin_optim, step_size=step_size, gamma=gamma)
-    schedulers.append(begin_scheduler)
-    end_scheduler = torch.optim.lr_scheduler.StepLR(end_optim, step_size=step_size, gamma=gamma)
-    schedulers.append(end_scheduler)
-    offsets_scheduler = torch.optim.lr_scheduler.StepLR(offsets_optim, step_size=step_size, gamma=gamma)
-    schedulers.append(offsets_scheduler)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
@@ -239,11 +234,9 @@ def main(args):
             image_features.append(clip_utils.simple_img_embed(aug))
 
         for image_feature in image_features:
-            for text_feature in poz_text_features:
-                loss+= cos_loss(image_feature, text_feature)
-
-            for text_feature in neg_text_features:
-                loss-= cos_loss(image_feature, text_feature)
+            for poz_text_feature in poz_text_features:
+                for neg_text_feature in neg_text_features:
+                    loss+= triple_loss(image_feature, poz_text_feature,neg_text_feature)
 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
@@ -255,8 +248,6 @@ def main(args):
         begin_optim.step()
         end_optim.step()
         offsets_optim.step()
-        for scheduler in schedulers:
-            scheduler.step()
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
