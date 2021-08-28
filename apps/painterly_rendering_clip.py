@@ -240,11 +240,10 @@ def main(args):
 
         for image_feature in image_features:
             for text_feature in poz_text_features:
-                print("TEXT feature:",text_feature.min(), text_feature.max())
-                loss+= cos_loss(image_feature, text_feature) + spherical_dist_loss(image_feature, text_feature)
+                loss+= cos_loss(image_feature, text_feature)
 
             for text_feature in neg_text_features:
-                loss-= cos_loss(image_feature, text_feature) - spherical_dist_loss(image_feature, text_feature) 
+                loss-= cos_loss(image_feature, text_feature)
 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
