@@ -147,7 +147,7 @@ def load_targets(targets):
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
-    augment_trans = transforms.Compose([transforms.RandomResizedCrop(224, scale=(0.7,0.9))])
+    augment_trans = transforms.Compose([transforms.RandomResizedCrop(224, scale=(0.3,0.9), ratio=(9/16,16/9))])
 
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
@@ -222,17 +222,22 @@ def main(args):
         loss = 0.0
         NUM_AUGS = 4
         img_augs = []
+        img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
         for _ in range(NUM_AUGS):
             img_augs.append(augment_trans(img))
         
         for aug in img_augs:
             image_features.append(clip_utils.simple_img_embed(aug))
-
+        #Loss compared to original image
+        for poz_text_feature in poz_text_features:
+                for neg_text_feature in neg_text_features:
+                    loss+= triple_loss(img_org_feature, poz_text_feature,neg_text_feature)
+        #Loss compared to augmetations
         for image_feature in image_features:
             for poz_text_feature in poz_text_features:
                 for neg_text_feature in neg_text_features:
-                    loss+= triple_loss(image_feature, poz_text_feature,neg_text_feature)
+                    loss+= triple_loss(image_feature, poz_text_feature,neg_text_feature)/NUM_AUGS
 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
