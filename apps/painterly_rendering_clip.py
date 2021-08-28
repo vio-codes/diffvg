@@ -141,8 +141,8 @@ def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
     augment_trans = transforms.Compose([ 
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9)),
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
+    transforms.RandomPerspective(fill=1, p=0.5, distortion_scale=0.5),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
     resize_aug = transforms.Resize(224)
