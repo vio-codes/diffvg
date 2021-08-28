@@ -40,7 +40,7 @@ def cos_loss(inputs, targets, y = 1):
     return cos_loss
 
 def triple_loss(inputs ,positives, negatives):
-    triplet_loss =  nn.TripletMarginWithDistanceLoss()
+    triplet_loss =  nn.TripletMarginWithDistanceLoss(distance_function=nn.CosineSimilarity(dim=-1))
     output = triplet_loss(inputs, positives, negatives)
     return output
 
