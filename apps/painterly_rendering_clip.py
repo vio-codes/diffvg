@@ -43,7 +43,7 @@ def triple_loss(inputs ,positives, negatives):
     inputs = F.normalize(inputs, dim=-1)
     positives = F.normalize(positives, dim=-1)
     negatives = F.normalize(negatives, dim=-1)
-    triplet_loss =  nn.TripletMarginWithDistanceLoss(distance_function=nn.nn.CosineSimilarity(dim=-1))
+    triplet_loss =  nn.TripletMarginWithDistanceLoss(distance_function=nn.CosineSimilarity(dim=-1))
     output = triplet_loss(inputs, positives, negatives)
     return output
 
