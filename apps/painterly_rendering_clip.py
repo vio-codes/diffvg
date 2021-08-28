@@ -1,11 +1,3 @@
-"""
-Scream: python painterly_rendering.py imgs/scream.jpg --num_paths 2048 --max_width 4.0
-Fallingwater: python painterly_rendering.py imgs/fallingwater.jpg --num_paths 2048 --max_width 4.0
-Fallingwater: python painterly_rendering.py imgs/fallingwater.jpg --num_paths 2048 --max_width 4.0 --use_lpips_loss
-Baboon: python painterly_rendering.py imgs/baboon.png --num_paths 1024 --max_width 4.0 --num_iter 250
-Baboon Lpips: python painterly_rendering.py imgs/baboon.png --num_paths 1024 --max_width 4.0 --num_iter 500 --use_lpips_loss
-Kitty: python painterly_rendering.py imgs/kitty.jpg --num_paths 1024 --use_blob
-"""
 import pydiffvg
 import torch
 import skimage
@@ -148,7 +140,11 @@ def load_targets(targets):
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
-    augment_trans = transforms.Compose([transforms.RandomResizedCrop(224, scale=(0.3,0.9), ratio=(9/16,16/9))])
+    augment_trans = transforms.Compose([ 
+    transforms.RandomResizedCrop(224, scale=(0.7,0.9)),
+    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
+    ])
     resize_aug = transforms.Resize(224)
 
     poz_text_features = load_targets(args.targets)
@@ -240,6 +236,7 @@ def main(args):
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(resize_aug(img))
         image_features = []
+        
         for _ in range(NUM_AUGS):
             img_augs.append(augment_trans(img))
         
