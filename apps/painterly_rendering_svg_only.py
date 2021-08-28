@@ -203,6 +203,24 @@ def main(args):
               "results/painterly_svg/iter_%d.png", "-c:v", "libx264", "-preset", "veryslow",
               "-crf", "20", "-vf", "format=yuv420p", "-movflags", "+faststart",
               "/content/final.mp4"])
+    with torch.no_grad():
+        for i in range(args.num_paths):
+            print("Strokes:", i)
+            scene_args = pydiffvg.RenderFunction.serialize_scene(
+                canvas_width, canvas_height, shapes[:i+1], shape_groups[:i+1])
+            img = render(canvas_width, canvas_height,
+                         2, 2, t, None, *scene_args)
+            img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
+                img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
+            pydiffvg.imwrite(
+                img.cpu(), '/content/res/stroke_{}.png'.format(i), gamma=gamma)
+    print("ffmpeging")
+    # Convert the intermediate renderings to a video.
+    from subprocess import call
+    call(["ffmpeg", "-f", "image2", "-y", "-framerate", "60", "-i",
+          "/content/res/stroke_%d.png", "-c:v", "libx264", "-preset", "veryslow",
+          "-crf", "20", "-vf", "format=yuv420p", "-movflags", "+faststart",
+          "/content/out_strokes-final.mp4"])          
 
 
 if __name__ == "__main__":
