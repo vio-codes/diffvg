@@ -18,6 +18,7 @@ import math
 import torch.nn as nn
 from torch.nn import functional as F
 from torch.autograd import Variable
+from IPython import display
 import clip_utils
 
 import torchvision
@@ -148,12 +149,13 @@ def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
     augment_trans = transforms.Compose([transforms.RandomResizedCrop(224, scale=(0.3,0.9), ratio=(9/16,16/9))])
+    resize_aug = transforms.Resize(224)
 
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
 
 
-    canvas_width, canvas_height = 224, 224
+    canvas_width, canvas_height = 1200, 1200
     num_paths = args.num_paths
 
     shapes = []
@@ -191,7 +193,19 @@ def main(args):
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
-
+        for group in shape_groups:
+            group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
+            group.fill_color.offsets[0].data.clamp_(0.0, 0.33)
+            group.fill_color.offsets[1].data.clamp_(0.33, 0.66)
+            group.fill_color.offsets[2].data.clamp_(0.66, 1.0)
+            group.fill_color.begin[0].data.clamp_(0.0, canvas_width)
+            group.fill_color.begin[1].data.clamp_(0.0, canvas_height)
+            group.fill_color.end[0].data.clamp_(0.0, canvas_width)
+            group.fill_color.end[1].data.clamp_(0.0, canvas_height)
+        for path in shapes:
+            path.points[:, 0].data.clamp_(0.0, canvas_width)
+            path.points[:, 1].data.clamp_(0.0, canvas_height)
+        
         points_optim.zero_grad()
         color_optim.zero_grad()
         begin_optim.zero_grad()
@@ -212,6 +226,8 @@ def main(args):
         img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
         pydiffvg.imwrite(
             img.cpu(), 'results/painterly_clip/iter_{}.png'.format(t), gamma=gamma)
+        if t % 100 == 0:
+            display.display(display.Image('results/painterly_clip/iter_{}.png'.format(t)))
 
         pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
@@ -222,7 +238,7 @@ def main(args):
         loss = 0.0
         NUM_AUGS = 4
         img_augs = []
-        img_org_feature = clip_utils.simple_img_embed(img)
+        img_org_feature = clip_utils.simple_img_embed(resize_aug(img))
         image_features = []
         for _ in range(NUM_AUGS):
             img_augs.append(augment_trans(img))
