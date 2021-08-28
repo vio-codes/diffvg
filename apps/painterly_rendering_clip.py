@@ -137,15 +137,14 @@ def load_targets(targets):
         targets = []
     else:
         for target in targets:
+            print("Embeding:",target)
             embed.append(clip_utils.embed_text(target))
     return embed        
 
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
-    augment_trans = transforms.Compose([
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9))])
+    augment_trans = transforms.Compose([transforms.RandomResizedCrop(224, scale=(0.7,0.9))])
 
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
