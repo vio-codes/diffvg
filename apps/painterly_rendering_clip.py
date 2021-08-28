@@ -234,6 +234,7 @@ def main(args):
         image_features = []
         for _ in range(NUM_AUGS):
             img_augs.append(augment_trans(img))
+        
         for aug in img_augs:
             image_features.append(clip_utils.simple_img_embed(aug))
 
@@ -244,7 +245,7 @@ def main(args):
             for text_feature in neg_text_features:
                 loss-= cos_loss(image_feature, text_feature) - spherical_dist_loss(image_feature, text_feature) 
 
-        print('render loss:', loss)
+        print('render loss:', loss.tem())
         # Backpropagate the gradients.
         loss.backward()
 
