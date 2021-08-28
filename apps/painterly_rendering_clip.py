@@ -40,10 +40,7 @@ def cos_loss(inputs, targets, y = 1):
     return cos_loss
 
 def triple_loss(inputs ,positives, negatives):
-    inputs = F.normalize(inputs, dim=-1)
-    positives = F.normalize(positives, dim=-1)
-    negatives = F.normalize(negatives, dim=-1)
-    triplet_loss =  nn.TripletMarginWithDistanceLoss(distance_function=nn.CosineSimilarity(dim=-1))
+    triplet_loss =  nn.TripletMarginWithDistanceLoss()
     output = triplet_loss(inputs, positives, negatives)
     return output
 
@@ -188,10 +185,10 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.01)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
     end_optim = torch.optim.Adam(end_vars, lr=0.1)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
     # Adam iterations.
     for t in range(args.num_iter):
         print('iteration:', t)
