@@ -143,13 +143,14 @@ def main(args):
 
     augment_trans = transforms.Compose([ 
     transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
-    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    transforms.randomApply([
+        transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
+        transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2)], p=0.3),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
     resize_aug = transforms.Resize(224)
 
-    auto_augment = transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET)
 
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
@@ -191,6 +192,7 @@ def main(args):
     end_optim = torch.optim.Adam(end_vars, lr=0.1)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
     # Adam iterations.
+    points_mean = []
     for t in range(args.num_iter):
         print('iteration:', t)
         for group in shape_groups:
@@ -205,7 +207,14 @@ def main(args):
         for path in shapes:
             path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
-        
+            points_mean.append(path.points.mean())
+            
+        distance_loss = 0    
+        #Distance from center loss
+        for pt_mean in points_mean:
+            distance_loss *= (pt_mean[:, 0]- canvas_width/2).pow(2) +(pt_mean[:,1]- canvas_height/2).pow(2)
+
+
         points_optim.zero_grad()
         color_optim.zero_grad()
         begin_optim.zero_grad()
@@ -255,6 +264,10 @@ def main(args):
             for poz_text_feature in poz_text_features:
                 for neg_text_feature in neg_text_features:
                     loss+= triple_loss(image_feature, poz_text_feature,neg_text_feature)/NUM_AUGS
+        
+
+        if t < 100:
+            loss += distance_loss
 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
