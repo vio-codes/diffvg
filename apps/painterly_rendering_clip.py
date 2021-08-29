@@ -33,7 +33,7 @@ def cos_loss(inputs, targets, y = 1):
     return cos_loss
 
 def triple_loss(inputs ,positives, negatives):
-    output = cos_loss(inputs, positives) - cos_loss(inputs, negatives)
+    output = cos_loss(inputs, positives) - cos_loss(inputs, negatives) + spherical_dist_loss(inputs, positives) - spherical_dist_loss(inputs, negatives)
     return output
 
 def dice_loss(inputs, targets, smooth=1):
@@ -188,11 +188,11 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
 
-    points_optim = torch.optim.Adam(points_vars, lr=3.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.3)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.3)
-    end_optim = torch.optim.Adam(end_vars, lr=0.3)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.3)
+    points_optim = torch.optim.Adam(points_vars, lr=2.0)
+    color_optim = torch.optim.Adam(color_vars, lr=0.2)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.5)
+    end_optim = torch.optim.Adam(end_vars, lr=0.5)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.02)
     # Adam iterations.
 
     for t in range(args.num_iter):
@@ -243,7 +243,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 8
+        NUM_AUGS = 16
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(resize_aug(img))
         image_features = []
