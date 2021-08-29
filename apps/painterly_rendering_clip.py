@@ -10,7 +10,6 @@ import math
 import torch.nn as nn
 from torch.nn import functional as F
 from torch.autograd import Variable
-from IPython import display
 import clip_utils
 
 import torchvision
@@ -148,6 +147,8 @@ def main(args):
     ])
     resize_aug = transforms.Resize(224)
 
+    auto_augment = transform.AutoAugment(transform.AutoAugmentPolicy.IMAGENET)
+
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
 
@@ -182,7 +183,7 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
 
-    points_optim = torch.optim.Adam(points_vars, lr=2.0)
+    points_optim = torch.optim.Adam(points_vars, lr=1.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.1)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
     end_optim = torch.optim.Adam(end_vars, lr=0.1)
@@ -224,7 +225,7 @@ def main(args):
         pydiffvg.imwrite(
             img.cpu(), 'results/painterly_clip/iter_{}.png'.format(t), gamma=gamma)
         if t % 100 == 0:
-            display.display(display.Image('results/painterly_clip/iter_{}.png'.format(t)))
+            skimage.io,imshow('results/painterly_clip/iter_{}.png'.format(t))
 
         pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
