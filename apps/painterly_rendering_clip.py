@@ -57,7 +57,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
         p0 = (random.random(), random.random())
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.05
+            radius = 0.3
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             p2 = (p1[0] + radius * (random.random() - 0.5),
@@ -192,7 +192,7 @@ def main(args):
     color_optim = torch.optim.Adam(color_vars, lr=0.2)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.5)
     end_optim = torch.optim.Adam(end_vars, lr=0.5)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.02)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.2)
     # Adam iterations.
 
     for t in range(args.num_iter):
