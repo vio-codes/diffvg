@@ -140,6 +140,7 @@ def load_targets(targets):
 def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
+
     augment_trans = transforms.Compose([ 
     transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
     transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
@@ -241,7 +242,7 @@ def main(args):
         image_features = []
         
         for _ in range(NUM_AUGS):
-            img_augs.append(auto_augment(img))
+            img_augs.append(augment_trans(img))
         
         for aug in img_augs:
             image_features.append(clip_utils.simple_img_embed(aug))
