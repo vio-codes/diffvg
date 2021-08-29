@@ -151,7 +151,7 @@ def main(args):
     neg_text_features = load_targets(args.negative_targets)
 
 
-    canvas_width, canvas_height = 1200, 1200
+    canvas_width, canvas_height = 224, 224
     num_paths = args.num_paths
 
     shapes = []
