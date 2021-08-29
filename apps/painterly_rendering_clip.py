@@ -144,8 +144,8 @@ def main(args):
     augment_trans = transforms.Compose([ 
     #transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
     transforms.CenterCrop(200),
-    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    #transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
+    #transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
     transforms.Resize(224),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
@@ -188,7 +188,7 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
 
-    points_optim = torch.optim.Adam(points_vars, lr=2.0)
+    #points_optim = torch.optim.Adam(points_vars, lr=2.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.2)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.5)
     end_optim = torch.optim.Adam(end_vars, lr=0.5)
@@ -213,7 +213,7 @@ def main(args):
         
 
 
-        points_optim.zero_grad()
+        #points_optim.zero_grad()
         color_optim.zero_grad()
         begin_optim.zero_grad()
         end_optim.zero_grad()
@@ -269,7 +269,7 @@ def main(args):
         loss.backward()
 
         # Take a gradient descent step.
-        points_optim.step()
+        #points_optim.step()
         color_optim.step()
         begin_optim.step()
         end_optim.step()
