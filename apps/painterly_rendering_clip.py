@@ -192,7 +192,7 @@ def main(args):
     end_optim = torch.optim.Adam(end_vars, lr=0.1)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
     # Adam iterations.
-    points_mean = []
+
     for t in range(args.num_iter):
         print('iteration:', t)
         for group in shape_groups:
@@ -207,12 +207,8 @@ def main(args):
         for path in shapes:
             path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
-            points_mean.append(path.points.mean())
             
-        distance_loss = 0    
-        #Distance from center loss
-        for pt_mean in points_mean:
-            distance_loss *= (pt_mean- torch.tensor([canvas_width/2, canvas_height/2])).pow(2).mean()
+        
 
 
         points_optim.zero_grad()
@@ -264,10 +260,7 @@ def main(args):
             for poz_text_feature in poz_text_features:
                 for neg_text_feature in neg_text_features:
                     loss+= triple_loss(image_feature, poz_text_feature,neg_text_feature)/NUM_AUGS
-        
-
-        if t < 100:
-            loss += distance_loss
+                    
 
         print('render loss:', loss.item())
         # Backpropagate the gradients.
