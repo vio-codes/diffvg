@@ -3,6 +3,7 @@ import torch
 import skimage
 import ttools.modules
 import skimage.io
+from skimage.io import imshow
 import skimage.color
 import random
 import argparse
@@ -225,7 +226,7 @@ def main(args):
         pydiffvg.imwrite(
             img.cpu(), 'results/painterly_clip/iter_{}.png'.format(t), gamma=gamma)
         if t % 100 == 0:
-            skimage.io,imshow('results/painterly_clip/iter_{}.png'.format(t))
+            skimage.io.imshow('results/painterly_clip/iter_{}.png'.format(t))
 
         pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
