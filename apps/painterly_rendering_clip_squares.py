@@ -33,7 +33,7 @@ def cos_loss(inputs, targets, y = 1):
     return cos_loss
 
 def triple_loss(inputs ,positives, negatives):
-    output = cos_loss(inputs, positives)*spherical_dist_loss(inputs, positives) - cos_loss(inputs, negatives)*spherical_dist_loss(inputs, negatives)
+    output = cos_loss(inputs, positives) - cos_loss(inputs, negatives) + spherical_dist_loss(inputs, positives) - spherical_dist_loss(inputs, negatives)
     return output
 
 def dice_loss(inputs, targets, smooth=1):
