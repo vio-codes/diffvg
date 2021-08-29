@@ -147,7 +147,7 @@ def main(args):
     ])
     resize_aug = transforms.Resize(224)
 
-    auto_augment = transform.AutoAugment(transform.AutoAugmentPolicy.IMAGENET)
+    auto_augment = transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET)
 
     poz_text_features = load_targets(args.targets)
     neg_text_features = load_targets(args.negative_targets)
