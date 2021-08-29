@@ -147,7 +147,7 @@ def main(args):
     transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
     transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
-    transform.Resize(224),
+    transforms.Resize(224),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
 
