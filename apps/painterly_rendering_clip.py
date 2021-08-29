@@ -240,7 +240,7 @@ def main(args):
         image_features = []
         
         for _ in range(NUM_AUGS):
-            img_augs.append(augment_trans(img))
+            img_augs.append(auto_augment(img))
         
         for aug in img_augs:
             image_features.append(clip_utils.simple_img_embed(aug))
