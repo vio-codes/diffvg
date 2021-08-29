@@ -148,7 +148,7 @@ def main(args):
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
-    
+
     resize_aug = transforms.Resize(224)
 
 
@@ -212,7 +212,7 @@ def main(args):
         distance_loss = 0    
         #Distance from center loss
         for pt_mean in points_mean:
-            distance_loss *= (pt_mean[:, 0]- canvas_width/2).pow(2) +(pt_mean[:,1]- canvas_height/2).pow(2)
+            distance_loss *= (pt_mean[0]- canvas_width/2).pow(2) +(pt_mean[1]- canvas_height/2).pow(2)
 
 
         points_optim.zero_grad()
