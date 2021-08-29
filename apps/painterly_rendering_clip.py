@@ -243,7 +243,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 4
+        NUM_AUGS = 16
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(resize_aug(img))
         image_features = []
