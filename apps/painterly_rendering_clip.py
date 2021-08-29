@@ -212,7 +212,7 @@ def main(args):
         distance_loss = 0    
         #Distance from center loss
         for pt_mean in points_mean:
-            distance_loss *= (pt_mean- torch.tensor([canvas_width/2, canvas_height/2])).pow(2)
+            distance_loss *= (pt_mean- torch.tensor([canvas_width/2, canvas_height/2])).pow(2).mean()
 
 
         points_optim.zero_grad()
