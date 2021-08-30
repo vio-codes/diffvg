@@ -46,9 +46,13 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
         p0 = (random.random(), random.random())
         points.append(p0)
         for j in range(num_segments):
-            p1 = (random.random(), random.random())
-            p2 = (random.random(), random.random())
-            p3 = (random.random(), random.random())
+            radius = 0.3
+            p1 = (p0[0] + radius * (random.random() - 0.5),
+                  p0[1] + radius * (random.random() - 0.5))
+            p2 = (p1[0] + radius * (random.random() - 0.5),
+                  p1[1] + radius * (random.random() - 0.5))
+            p3 = (p2[0] + radius * (random.random() - 0.5),
+                  p2[1] + radius * (random.random() - 0.5))
             points.append(p1)
             points.append(p2)
             if j < num_segments - 1:
@@ -127,13 +131,13 @@ def main(args):
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
     augment_trans = transforms.Compose([ 
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
-    transforms.CenterCrop(200),
-    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    #transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
+    #transforms.CenterCrop(200),
+    #transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
+    #transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
-    transforms.Resize(224),
-    transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
+    #transforms.Resize(224),
+    #transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
 
     poz_text_features = load_targets(args.targets)
@@ -169,11 +173,11 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
 
-    points_optim = torch.optim.Adam(points_vars, lr=1.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.1)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
-    end_optim = torch.optim.Adam(end_vars, lr=0.1)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
+    points_optim = torch.optim.Adam(points_vars, lr=0.01)
+    color_optim = torch.optim.Adam(color_vars, lr=0.002)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.005)
+    end_optim = torch.optim.Adam(end_vars, lr=0.005)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.002)
     # Adam iterations.
 
     for t in range(args.num_iter):
@@ -206,7 +210,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 16
+        NUM_AUGS = 2
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
