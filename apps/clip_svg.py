@@ -46,7 +46,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
         p0 = (random.random(), random.random())
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.1
+            radius = 0.7
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             p2 = (p1[0] + radius * (random.random() - 0.5),
