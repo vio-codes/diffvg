@@ -276,7 +276,7 @@ def main(args):
     if args.debug:
         from subprocess import call
         call(["ffmpeg", "-framerate", "24", "-i",
-              "results/painterly_clip/iter_%d.png", "-c:v", "libx264", "-preset", "veryslow",
+              "/content/results/clip_svg/iter_%d.png", "-c:v", "libx264", "-preset", "veryslow",
               "-crf", "20", "-vf", "format=yuv420p", "-movflags", "+faststart",
               "/content/final.mp4"])
 
