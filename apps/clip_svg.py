@@ -47,12 +47,12 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
         points.append(p0)
         for j in range(num_segments):
             radius = 0.3
-            p1 = (p0[0] + radius * (random.random() - 0.5),
-                  p0[1] + radius * (random.random() - 0.5))
-            p2 = (p1[0] + radius * (random.random() - 0.5),
-                  p1[1] + radius * (random.random() - 0.5))
-            p3 = (p2[0] + radius * (random.random() - 0.5),
-                  p2[1] + radius * (random.random() - 0.5))
+            p1 = (p0[0] + radius * (random.random()),
+                  p0[1] + radius * (random.random()))
+            p2 = (p1[0] + radius * (random.random()),
+                  p1[1] + radius * (random.random()))
+            p3 = (p2[0] + radius * (random.random()),
+                  p2[1] + radius * (random.random()))
             points.append(p1)
             points.append(p2)
             if j < num_segments - 1:
