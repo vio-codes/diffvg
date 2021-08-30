@@ -210,7 +210,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 4
+        NUM_AUGS = 16
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
@@ -242,13 +242,17 @@ def main(args):
         loss.backward()
 
         # Take a gradient descent step.
-        if t < int(args.num_iter*0.9):
+        if t < int(args.num_iter*0.5):
+            points_optim.step()
             color_optim.step()
             begin_optim.step()
             end_optim.step()
             offsets_optim.step()
         else:   
-            points_optim.step()
+            color_optim.step()
+            begin_optim.step()
+            end_optim.step()
+            offsets_optim.step()
        
 
         for group in shape_groups:
