@@ -221,7 +221,7 @@ def main(args):
             image_features.append(clip_utils.simple_img_embed(aug))
         #Loss compared to original image
         for poz_text_feature in poz_text_features:
-                loss+= cos_loss(img_org_feature, poz_text_feature) + spherical_dist_loss(image_feature, poz_text_feature)
+                loss+= cos_loss(img_org_feature, poz_text_feature) + spherical_dist_loss(img_org_feature, poz_text_feature)
         #Loss compared to augmetations
         if args.augment:
             for _ in range(NUM_AUGS):
