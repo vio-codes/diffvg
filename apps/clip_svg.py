@@ -223,13 +223,9 @@ def main(args):
         if args.augment:
             for _ in range(NUM_AUGS):
                 img_augs.append(augment_trans(img))
-
-            grid = vutils.make_grid(img_augs)
-            vutils.save_image(grid,'/content/results/clip_svg/iter_{}aug.png'.format(t,) )
-
             for aug in img_augs:
                 image_features.append(clip_utils.simple_img_embed(aug))
-                #pydiffvg.imwrite(aug.cpu(), '/content/results/clip_svg/iter_{}aug{}.png'.format(t,img_augs.index(aug[0])), gamma=gamma)
+                vutils.save_image(grid,'/content/results/clip_svg/iter_{}aug.png'.format(t) )
             for image_feature in image_features:
                 for poz_text_feature in poz_text_features:
                         loss+= cos_loss(image_feature, poz_text_feature)/NUM_AUGS
