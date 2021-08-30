@@ -198,7 +198,7 @@ def main(args):
         img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
         pydiffvg.imwrite(img.cpu(), '/content/results/clip_svg/iter_{}.png'.format(t), gamma=gamma)
 
-        pydiffvg.save_svg('/content/results/clip_svg/iter_{}.svg'.format(t),
+        pydiffvg.save_ln_gradient_svg('/content/results/clip_svg/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
         img = img[:, :, :3]
         img = img.unsqueeze(0)
@@ -270,7 +270,7 @@ def main(args):
         img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
     # Save the intermediate render.
     pydiffvg.imwrite(img.cpu(), "/content/final.png", gamma=gamma)
-    pydiffvg.save_svg('/content/final.svg',
+    pydiffvg.save_ln_gradient_svg('/content/final.svg',
                                   canvas_width, canvas_height, shapes, shape_groups)
     if args.debug:
         from subprocess import call
