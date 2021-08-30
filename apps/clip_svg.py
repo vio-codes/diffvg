@@ -241,7 +241,7 @@ def main(args):
             begin_optim.step()
             end_optim.step()
             offsets_optim.step()
-         else:   
+        else:   
             points_optim.step()
        
 
