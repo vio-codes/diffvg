@@ -214,7 +214,7 @@ def main(args):
         for i in range(NUM_AUGS):
             aug = augment_trans(img)
             img_augs.append(aug)
-            if args. and False:
+            if args.debug and False:
                 vutils.save_image(aug,'/content/results/clip_svg/iter_{}aug{}.png'.format(t, i))
 
         for aug in img_augs:
