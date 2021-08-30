@@ -226,7 +226,7 @@ def main(args):
             for aug in img_augs:
                 image_features.append(clip_utils.simple_img_embed(aug))
                 if args.debug:
-                    vutils.save_image(aug,'/content/results/clip_svg/iter_{}aug{}.png'.format(t,img_aug.index(aug)))
+                    vutils.save_image(aug,'/content/results/clip_svg/iter_{}aug{}.png'.format(t,img_augs.index(aug)))
             for image_feature in image_features:
                 for poz_text_feature in poz_text_features:
                         loss+= cos_loss(image_feature, poz_text_feature)/NUM_AUGS
