@@ -32,17 +32,6 @@ def cos_loss(inputs, targets, y = 1):
     cos_loss = F.cosine_embedding_loss(inputs, targets, y)
     return cos_loss
 
-def triple_loss(inputs ,positives, negatives):
-    output = cos_loss(inputs, positives) - cos_loss(inputs, negatives) + spherical_dist_loss(inputs, positives) - spherical_dist_loss(inputs, negatives)
-    return output
-
-def dice_loss(inputs, targets, smooth=1):
-    inputs = F.normalize(inputs, dim=-1)
-    targets = F.normalize(targets, dim=-1)        
-    intersection = (inputs * targets).sum()                            
-    dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
-        
-    return 1 - dice
 
 @torch.no_grad()
 def generate_blobs(num_paths, canvas_width, canvas_height):
@@ -57,13 +46,9 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
         p0 = (random.random(), random.random())
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.3
-            p1 = (p0[0] + radius * (random.random() - 0.5),
-                  p0[1] + radius * (random.random() - 0.5))
-            p2 = (p1[0] + radius * (random.random() - 0.5),
-                  p1[1] + radius * (random.random() - 0.5))
-            p3 = (p2[0] + radius * (random.random() - 0.5),
-                  p2[1] + radius * (random.random() - 0.5))
+            p1 = (random.random(), random.random())
+            p2 = (random.random(), random.random())
+            p3 = (random.random(), random.random())
             points.append(p1)
             points.append(p2)
             if j < num_segments - 1:
@@ -142,20 +127,16 @@ def main(args):
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
     augment_trans = transforms.Compose([ 
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
-    transforms.CenterCrop(200),
-    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    #transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
+    #transforms.CenterCrop(200),
+    #transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
+    #transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
-    transforms.Resize(224),
-    transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
+    #transforms.Resize(224),
+    #transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
 
-    resize_aug = transforms.Resize(224)
-
-
     poz_text_features = load_targets(args.targets)
-    neg_text_features = load_targets(args.negative_targets)
 
 
     canvas_width, canvas_height = 224, 224
@@ -188,32 +169,17 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
 
-    #points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.02)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.05)
-    end_optim = torch.optim.Adam(end_vars, lr=0.05)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.02)
+    points_optim = torch.optim.Adam(points_vars, lr=1.0)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.5)
+    end_optim = torch.optim.Adam(end_vars, lr=0.5)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
     # Adam iterations.
 
     for t in range(args.num_iter):
         print('iteration:', t)
-        for group in shape_groups:
-            group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
-            group.fill_color.offsets[0].data.clamp_(0.0, 0.33)
-            group.fill_color.offsets[1].data.clamp_(0.33, 0.66)
-            group.fill_color.offsets[2].data.clamp_(0.66, 1.0)
-            group.fill_color.begin[0].data.clamp_(0.0, canvas_width)
-            group.fill_color.begin[1].data.clamp_(0.0, canvas_height)
-            group.fill_color.end[0].data.clamp_(0.0, canvas_width)
-            group.fill_color.end[1].data.clamp_(0.0, canvas_height)
-        for path in shapes:
-            path.points[:, 0].data.clamp_(0.0, canvas_width)
-            path.points[:, 1].data.clamp_(0.0, canvas_height)
-            
-        
-
-
-        #points_optim.zero_grad()
+               
+        points_optim.zero_grad()
         color_optim.zero_grad()
         begin_optim.zero_grad()
         end_optim.zero_grad()
@@ -231,21 +197,18 @@ def main(args):
 
         # Save the intermediate render.
         img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
-        pydiffvg.imwrite(
-            img.cpu(), 'results/painterly_clip/iter_{}.png'.format(t), gamma=gamma)
-        if t % 100 == 0:
-            skimage.io.imshow('results/painterly_clip/iter_{}.png'.format(t))
+        pydiffvg.imwrite(img.cpu(), '/content/results/clip_svg/iter_{}.png'.format(t), gamma=gamma)
 
-        pydiffvg.save_ln_gradient_svg('results/painterly_clip/iter_{}.svg'.format(t),
+        pydiffvg.save_svg('/content/results/clip_svg/iter_{}.svg'.format(t),
                                       canvas_width, canvas_height, shapes, shape_groups)
         img = img[:, :, :3]
         img = img.unsqueeze(0)
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 16
+        NUM_AUGS = 4
         img_augs = []
-        img_org_feature = clip_utils.simple_img_embed(resize_aug(img))
+        img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
         
         for _ in range(NUM_AUGS):
@@ -255,13 +218,17 @@ def main(args):
             image_features.append(clip_utils.simple_img_embed(aug))
         #Loss compared to original image
         for poz_text_feature in poz_text_features:
-                for neg_text_feature in neg_text_features:
-                    loss+= triple_loss(img_org_feature, poz_text_feature,neg_text_feature)
+                loss+= cos_loss(img_org_feature, poz_text_feature)
         #Loss compared to augmetations
-        for image_feature in image_features:
-            for poz_text_feature in poz_text_features:
-                for neg_text_feature in neg_text_features:
-                    loss+= triple_loss(image_feature, poz_text_feature,neg_text_feature)/NUM_AUGS
+        if args.augment:
+            for _ in range(NUM_AUGS):
+                img_augs.append(augment_trans(img))
+            for aug in img_augs:
+                image_features.append(clip_utils.simple_img_embed(aug))
+                pydiffvg.imwrite(aug.cpu(), '/content/results/clip_svg/iter_{}aug{}.png'.format(t,img_augs.index(aug)), gamma=gamma)
+            for image_feature in image_features:
+                for poz_text_feature in poz_text_features:
+                        loss+= cos_loss(image_feature, poz_text_feature)/NUM_AUGS
 
 
         print('render loss:', loss.item())
@@ -269,11 +236,14 @@ def main(args):
         loss.backward()
 
         # Take a gradient descent step.
-        #points_optim.step()
-        color_optim.step()
-        begin_optim.step()
-        end_optim.step()
-        offsets_optim.step()
+        if t < int(args.num_iter*0.9):
+            color_optim.step()
+            begin_optim.step()
+            end_optim.step()
+            offsets_optim.step()
+         else:   
+            points_optim.step()
+       
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
@@ -301,7 +271,7 @@ def main(args):
         img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()) * (1 - img[:, :, 3:4])
     # Save the intermediate render.
     pydiffvg.imwrite(img.cpu(), "/content/final.png", gamma=gamma)
-    pydiffvg.save_ln_gradient_svg('/content/final.svg',
+    pydiffvg.save_svg('/content/final.svg',
                                   canvas_width, canvas_height, shapes, shape_groups)
     if args.debug:
         from subprocess import call
@@ -314,10 +284,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--targets", help="target text")
-    parser.add_argument("--negative_targets", help="target text")
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--debug", dest='debug', action='store_true')
-    parser.add_argument("--aug_perc", type=int, default=50)
+    parser.add_argument("--augment", dest='augment', action='store_true')
     args = parser.parse_args()
     main(args)
