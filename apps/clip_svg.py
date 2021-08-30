@@ -173,7 +173,7 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
 
-    points_optim = torch.optim.Adam(points_vars, lr=0.1)
+    points_optim = torch.optim.Adam(points_vars, lr=2.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.02)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.05)
     end_optim = torch.optim.Adam(end_vars, lr=0.05)
@@ -242,7 +242,7 @@ def main(args):
         loss.backward()
 
         # Take a gradient descent step.
-        if t < int(args.num_iter*0.5):
+        if t < int(args.num_iter*0.1):
             points_optim.step()
             color_optim.step()
             begin_optim.step()
