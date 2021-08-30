@@ -170,10 +170,10 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.05)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.05)
-    end_optim = torch.optim.Adam(end_vars, lr=0.05)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
+    end_optim = torch.optim.Adam(end_vars, lr=0.1)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
     # Adam iterations.
 
     for t in range(args.num_iter):
@@ -206,7 +206,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 4
+        NUM_AUGS = 16
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
@@ -215,7 +215,7 @@ def main(args):
             aug = augment_trans(img)
             img_augs.append(aug)
             if args.debug:
-                vutils.save_image(aug,'/content/results/clip_svg/iter_{}aug{}.png'.format(t, i))
+                #vutils.save_image(aug,'/content/results/clip_svg/iter_{}aug{}.png'.format(t, i))
 
         for aug in img_augs:
             image_features.append(clip_utils.simple_img_embed(aug))
