@@ -131,13 +131,13 @@ def main(args):
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
     augment_trans = transforms.Compose([ 
-    #transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
-    #transforms.CenterCrop(200),
-    #transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
-    #transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
+    transforms.CenterCrop(200),
+    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
+    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
-    #transforms.Resize(224),
-    #transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
+    transforms.Resize(224),
+    transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
 
     poz_text_features = load_targets(args.targets)
@@ -210,7 +210,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 2
+        NUM_AUGS = 4
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
@@ -218,7 +218,7 @@ def main(args):
         for i in range(NUM_AUGS):
             aug = augment_trans(img)
             img_augs.append(aug)
-            if args.debug and False:
+            if args.debug:
                 vutils.save_image(aug,'/content/results/clip_svg/iter_{}aug{}.png'.format(t, i))
 
         for aug in img_augs:
