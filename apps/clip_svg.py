@@ -170,10 +170,10 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=1.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.1)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.5)
-    end_optim = torch.optim.Adam(end_vars, lr=0.5)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
+    color_optim = torch.optim.Adam(color_vars, lr=0.01)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.05)
+    end_optim = torch.optim.Adam(end_vars, lr=0.05)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
     # Adam iterations.
 
     for t in range(args.num_iter):
@@ -221,7 +221,7 @@ def main(args):
             image_features.append(clip_utils.simple_img_embed(aug))
         #Loss compared to original image
         for poz_text_feature in poz_text_features:
-                loss+= cos_loss(img_org_feature, poz_text_feature)
+                loss+= cos_loss(img_org_feature, poz_text_feature) + spherical_dist_loss(image_feature, poz_text_feature)
         #Loss compared to augmetations
         if args.augment:
             for _ in range(NUM_AUGS):
@@ -230,7 +230,7 @@ def main(args):
                 image_features.append(clip_utils.simple_img_embed(aug))
             for image_feature in image_features:
                 for poz_text_feature in poz_text_features:
-                        loss+= cos_loss(image_feature, poz_text_feature)/NUM_AUGS
+                        loss+= (cos_loss(image_feature, poz_text_feature) + spherical_dist_loss(image_feature, poz_text_feature))/NUM_AUGS
 
 
         print('render loss:', loss.item())
