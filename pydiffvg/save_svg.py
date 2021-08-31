@@ -16,7 +16,7 @@ def prettify(elem):
 
 def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
     dwg = svgwrite.Drawing(filename, size=(
-        width, height), profile='full', debug=True)
+        width, height), profile='tiny', debug=True)
     for i, shape_group in enumerate(shape_groups):
         # color for the blob
         shape = shapes[shape_group.shape_ids[0]]
