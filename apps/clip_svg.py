@@ -136,7 +136,7 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()]]))
-        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor([len(shapes)-1]),
+        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor([len(shapes)-1 + 0]),
                                          fill_color=gradient)
         shape_groups.append(path_group)
         ids += len(shapes) 
