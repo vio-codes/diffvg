@@ -34,7 +34,7 @@ def cos_loss(inputs, targets, y = 1):
 
 
 @torch.no_grad()
-def generate_blobs(num_paths, canvas_width, canvas_height):
+def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
     shapes = []
     shape_groups = []
 
@@ -86,14 +86,15 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()]]))
-        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor([len(shapes) - 1]),
+        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor(list(range(ids, len(shapes)-1))),
                                          fill_color=gradient)
         shape_groups.append(path_group)
+        ids += len(shapes)
 
-    return shapes, shape_groups   
+    return shapes, shape_groups , ids 
 
 @torch.no_grad()
-def generate_polygons(num_paths, canvas_width, canvas_height):
+def generate_polygons(num_paths, canvas_width, canvas_heightids = 0):
     shapes = []
     shape_groups = []
 
@@ -135,11 +136,11 @@ def generate_polygons(num_paths, canvas_width, canvas_height):
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()]]))
-        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor([len(shapes) - 1]),
+        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor(list(range(ids, len(shapes)-1))),
                                          fill_color=gradient)
         shape_groups.append(path_group)
-
-    return shapes, shape_groups 
+        ids += len(shapes) 
+    return shapes, shape_groups ,ids
 
 
 
@@ -197,17 +198,17 @@ def main(args):
     shape_groups = []
 
     if args.generate == "blobs":
-        new_shapes, new_shape_groups = generate_blobs(num_paths, canvas_width, canvas_height)
+        new_shapes, new_shape_groups, _ = generate_blobs(num_paths, canvas_width, canvas_height)
         shapes.extend(new_shapes)
         shape_groups.extend(new_shape_groups)
     
     elif args.generate == "polygons":
-        new_shapes, new_shape_groups = generate_polygons(num_paths, canvas_width, canvas_height)
+        new_shapes, new_shape_groups, _ = generate_polygons(num_paths, canvas_width, canvas_height)
         shapes.extend(new_shapes)
         shape_groups.extend(new_shape_groups)
     else:
-        new_shapes_blobs, new_shape_groups_blobs = generate_blobs(int(num_paths*0.5), canvas_width, canvas_height)
-        new_shapes_polygons, new_shape_groups_polygons = generate_polygons(int(num_paths*0.5), canvas_width, canvas_height)
+        new_shapes_blobs, new_shape_groups_blobs, ids= generate_blobs(int(num_paths*0.5), canvas_width, canvas_height)
+        new_shapes_polygons, new_shape_groups_polygons, _ = generate_polygons(int(num_paths*0.5), canvas_width, canvas_height, ids)
         shapes.extend(new_shapes_blobs)
         shapes.extend(new_shapes_polygons)
         shape_groups.extend(new_shape_groups_blobs)
