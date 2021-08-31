@@ -270,7 +270,7 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = 16
+        NUM_AUGS = args.num_aug
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
@@ -351,6 +351,7 @@ if __name__ == "__main__":
     parser.add_argument("--targets", help="target text")
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
+    parser.add_argument("--num_aug", type=int, default=2)
     parser.add_argument("--generate", choices=['blobs', 'polygons', 'mix'])
     parser.add_argument("--debug", dest='debug', action='store_true')
     parser.add_argument("--augment", dest='augment', action='store_true')
