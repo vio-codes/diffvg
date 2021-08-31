@@ -46,7 +46,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
         p0 = (random.random(), random.random())
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.7
+            radius = 0.3
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             p2 = (p1[0] + radius * (random.random() - 0.5),
@@ -209,8 +209,10 @@ def main(args):
         ratio = random.random()
         new_shapes_blobs, new_shape_groups_blobs = generate_blobs(int(num_paths*ratio), canvas_width, canvas_height)
         new_shapes_polygons, new_shape_groups_polygons = generate_polygons(int(num_paths*(1-ratio)), canvas_width, canvas_height)
-        shapes.extend(new_shapes_blobs,new_shapes_polygons)
-        shape_groups.extend(new_shape_groups_blobs,new_shape_groups_polygons)
+        shapes.extend(new_shapes_blobs)
+        shapes.extend(new_shapes_polygons)
+        shape_groups.extend(new_shape_groups_blobs)
+        shape_groups.extend(new_shape_groups_polygons)
                
     
     
