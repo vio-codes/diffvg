@@ -34,7 +34,7 @@ def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
         
         if isinstance(shape, pydiffvg.Polygon):
             points = shape.points.data.cpu().numpy()
-            dwg.add(dwg.polygon([points=(x[0], x[1]) for x in points], stroke='none',fill='url(#{})'.format(i)))
+            dwg.add(dwg.polygon(points=[(x[0], x[1]) for x in points], stroke='none',fill='url(#{})'.format(i)))
             
         else: # path for the blob
             num_segments = shape.num_control_points.shape[0]
