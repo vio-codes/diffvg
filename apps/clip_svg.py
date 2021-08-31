@@ -86,7 +86,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()]]))
-        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor(list(range(ids, len(shapes)-1))),
+        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor(list(range(ids, len(shapes)+ ids -1))),
                                          fill_color=gradient)
         shape_groups.append(path_group)
         ids += len(shapes)
@@ -136,7 +136,7 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()]]))
-        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor(list(range(ids, len(shapes)-1))),
+        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor(list(range(ids, len(shapes)+ids-1))),
                                          fill_color=gradient)
         shape_groups.append(path_group)
         ids += len(shapes) 
