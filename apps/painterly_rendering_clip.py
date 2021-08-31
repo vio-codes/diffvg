@@ -57,7 +57,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
         p0 = (random.random(), random.random())
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.5
+            radius = 0.1
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             p2 = (p1[0] + radius * (random.random() - 0.5),
@@ -142,16 +142,13 @@ def main(args):
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
     augment_trans = transforms.Compose([ 
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
-    transforms.CenterCrop(200),
-    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+    transforms.RandomResizedCrop(224, scale=(0.7, 1.0)),
+    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 1.0), fill= 1),
+    transforms.RandomPerspective(fill=1, p=0.1, distortion_scale=0.5),
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
-    transforms.Resize(224),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
 
-    resize_aug = transforms.Resize(224)
 
 
     poz_text_features = load_targets(args.targets)
@@ -210,8 +207,6 @@ def main(args):
             path.points[:, 0].data.clamp_(0.0, canvas_width)
             path.points[:, 1].data.clamp_(0.0, canvas_height)
             
-        
-
 
         points_optim.zero_grad()
         color_optim.zero_grad()
@@ -268,14 +263,21 @@ def main(args):
         # Backpropagate the gradients.
         loss.backward()
 
-        # Take a gradient descent step.
-        if t > args.num_iter-500:
+# Take a gradient descent step.
+        if t < int(args.num_iter*0.1):
             points_optim.step()
-        
-        color_optim.step()
-        begin_optim.step()
-        end_optim.step()
-        offsets_optim.step()
+            color_optim.step()
+            begin_optim.step()
+            end_optim.step()
+            offsets_optim.step()
+        elif t > int(args.num_iter*0.9):
+            points_optim.step()      
+        else:
+            color_optim.step()
+            begin_optim.step()
+            end_optim.step()
+            offsets_optim.step()
+
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
