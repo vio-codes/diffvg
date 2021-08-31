@@ -90,7 +90,60 @@ def generate_blobs(num_paths, canvas_width, canvas_height):
                                          fill_color=gradient)
         shape_groups.append(path_group)
 
-    return shapes, shape_groups    
+    return shapes, shape_groups   
+
+@torch.no_grad()
+def generate_polygons(num_paths, canvas_width, canvas_height):
+    shapes = []
+    shape_groups = []
+
+    for i in range(num_paths):
+        num_segments = random.randint(3, 5)
+        points = []
+        p0 = (0.5, 0.5)
+        points.append(p0)
+        for j in range(num_segments):
+            radius = 0.2
+            p1 = (p0[0] + radius * (random.random() - 0.5),
+                  p0[1] + radius * (random.random() - 0.5))
+            points.append(p1)
+            if j < num_segments - 1:
+                points.append(p1)
+                p0 = p1
+        points = torch.tensor(points)
+        points[:, 0] *= canvas_width
+        points[:, 1] *= canvas_height
+        path =  pydiffvg.Polygon(points = points, is_closed = True)
+        shapes.append(path)
+        x_max = torch.max(path.points[:, 0])
+        x_min = torch.min(path.points[:, 0])
+        y_max = torch.max(path.points[:, 1])
+        y_min = torch.min(path.points[:, 1])
+        gradient = pydiffvg.LinearGradient(begin=torch.tensor([x_min, y_min]),
+                                           end=torch.tensor([x_max, y_max]),
+                                           offsets=torch.tensor(
+                                               [0.0, 0.5, 1.0]),
+                                           stop_colors=torch.tensor([[random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()],
+                                                                     [random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()],
+                                                                     [random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()]]))
+        path_group = pydiffvg.ShapeGroup(shape_ids=torch.tensor([len(shapes) - 1]),
+                                         fill_color=gradient)
+        shape_groups.append(path_group)
+
+    return shapes, shape_groups 
+
+
+
+
 
 def generate_vars(shapes, shape_groups):
     points_vars = []
@@ -131,12 +184,7 @@ def main(args):
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
     augment_trans = transforms.Compose([ 
-    transforms.RandomResizedCrop(224, scale=(0.7,0.9), ratio=(9/16, 16/9)),
-    transforms.CenterCrop(200),
-    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 0.9), fill= 1),
-    transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
-    transforms.Resize(224),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
 
@@ -149,10 +197,23 @@ def main(args):
     shapes = []
     shape_groups = []
 
-    new_shapes, new_shape_groups = generate_blobs(num_paths, canvas_width, canvas_height)
-
-    shapes.extend(new_shapes)
-    shape_groups.extend(new_shape_groups)
+    if args.generate == "blobs":
+        new_shapes, new_shape_groups = generate_blobs(num_paths, canvas_width, canvas_height)
+        shapes.extend(new_shapes)
+        shape_groups.extend(new_shape_groups)
+    
+    elif args.generate == "polygons":
+        new_shapes, new_shape_groups = generate_polygons(num_paths, canvas_width, canvas_height)
+        shapes.extend(new_shapes)
+        shape_groups.extend(new_shape_groups)
+    else:
+        ratio = random.random()
+        new_shapes_blobs, new_shape_groups_blobs = generate_blobs(int(num_paths*ratio), canvas_width, canvas_height)
+        new_shapes_polygons, new_shape_groups_polygons = generate_polygons(int(num_paths*(1-ratio)), canvas_width, canvas_height)
+        shapes.extend(new_shapes_blobs,new_shapes_polygons)
+        shape_groups.extend(new_shape_groups_blobs,new_shape_groups_polygons)
+               
+    
     
     points_vars = []
     color_vars = []
@@ -296,6 +357,7 @@ if __name__ == "__main__":
     parser.add_argument("--targets", help="target text")
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
+    parser.add_argument("--generate", choices=['blobs', 'polygons', 'mix'])
     parser.add_argument("--debug", dest='debug', action='store_true')
     parser.add_argument("--augment", dest='augment', action='store_true')
     args = parser.parse_args()
