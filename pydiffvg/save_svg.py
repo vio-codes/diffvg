@@ -36,7 +36,7 @@ def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
             points = shape.points.data.cpu().numpy()
             polygon =[]
             for point in points:
-                polygon.append(point[0], point[1])
+                polygon.append((point[0], point[1]))
             print("polygon", polygon)
             dwg.add(dwg.polygon(polygon, stroke='none',fill='url(#{})'.format(i)))
             
