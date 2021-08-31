@@ -31,34 +31,38 @@ def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
             linear_gradient.add_stop_color(offset=str(offsets[j]), color=svgwrite.utils.rgb(
                 r=int(255 * c[0]), g=int(255 * c[1]), b=int(255 * c[2]), mode='RGB'), opacity=c[3])
 
-         # path for the blob
-        num_segments = shape.num_control_points.shape[0]
-        num_control_points = shape.num_control_points.data.cpu().numpy()
-        points = shape.points.data.cpu().numpy()
-        num_points = shape.points.shape[0]
-        path_str = 'M {} {}'.format(points[0, 0], points[0, 1])
-        point_id = 1
-        for j in range(0, num_segments):
-            if num_control_points[j] == 0:
-                p = point_id % num_points
-                path_str += ' L {} {}'.format(
-                    points[p, 0], points[p, 1])
-                point_id += 1
-            elif num_control_points[j] == 1:
-                p1 = (point_id + 1) % num_points
-                path_str += ' Q {} {} {} {}'.format(
-                    points[point_id, 0], points[point_id, 1],
-                    points[p1, 0], points[p1, 1])
-                point_id += 2
-            elif num_control_points[j] == 2:
-                p2 = (point_id + 2) % num_points
-                path_str += ' C {} {} {} {} {} {}'.format(
+        
+        if isinstance(shape, pydiffvg.Polygon):
+            points = shape.points.data.cpu().numpy()
+            dwg.add(dwg.polygon(points, stroke='none',fill='url(#{})'.format(i)))
+            
+        else: # path for the blob
+            num_segments = shape.num_control_points.shape[0]
+            num_control_points = shape.num_control_points.data.cpu().numpy()
+            points = shape.points.data.cpu().numpy()
+            num_points = shape.points.shape[0]
+            path_str = 'M {} {}'.format(points[0, 0], points[0, 1])
+            point_id = 1
+            for j in range(0, num_segments):
+                if num_control_points[j] == 0:
+                    p = point_id % num_points
+                    path_str += ' L {} {}'.format(
+                        points[p, 0], points[p, 1])
+                    point_id += 1
+                elif num_control_points[j] == 1:
+                    p1 = (point_id + 1) % num_points
+                    path_str += ' Q {} {} {} {}'.format(
+                        points[point_id, 0], points[point_id, 1],
+                        points[p1, 0], points[p1, 1])
+                    point_id += 2
+                elif num_control_points[j] == 2:
+                    p2 = (point_id + 2) % num_points
+                    path_str += ' C {} {} {} {} {} {}'.format(
                     points[point_id, 0], points[point_id, 1],
                     points[point_id + 1, 0], points[point_id + 1, 1],
                     points[p2, 0], points[p2, 1])
                 point_id += 3
-        dwg.add(dwg.path(path_str, stroke='none',
-                fill='url(#{})'.format(i)))
+            dwg.add(dwg.path(path_str, stroke='none',fill='url(#{})'.format(i)))
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     dwg.save()
 
