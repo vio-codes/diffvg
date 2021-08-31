@@ -94,7 +94,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
     return shapes, shape_groups , ids 
 
 @torch.no_grad()
-def generate_polygons(num_paths, canvas_width, canvas_heightids = 0):
+def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
     shapes = []
     shape_groups = []
 
