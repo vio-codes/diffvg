@@ -240,7 +240,7 @@ def main(args):
         loss = 0.0
         NUM_AUGS = 16
         img_augs = []
-        img_org_feature = clip_utils.simple_img_embed(resize_aug(img))
+        img_org_feature = clip_utils.simple_img_embed(img)
         image_features = []
         
         for _ in range(NUM_AUGS):
