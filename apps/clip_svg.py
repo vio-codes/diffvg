@@ -103,7 +103,7 @@ def generate_polygons(num_paths, canvas_width, canvas_height):
         p0 = (0.5, 0.5)
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.3
+            radius = 0.5
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             points.append(p1)
