@@ -206,9 +206,8 @@ def main(args):
         shapes.extend(new_shapes)
         shape_groups.extend(new_shape_groups)
     else:
-        ratio = random.random()
-        new_shapes_blobs, new_shape_groups_blobs = generate_blobs(int(num_paths*ratio), canvas_width, canvas_height)
-        new_shapes_polygons, new_shape_groups_polygons = generate_polygons(int(num_paths*(1-ratio)), canvas_width, canvas_height)
+        new_shapes_blobs, new_shape_groups_blobs = generate_blobs(int(num_paths*0.5), canvas_width, canvas_height)
+        new_shapes_polygons, new_shape_groups_polygons = generate_polygons(int(num_paths*0.5)), canvas_width, canvas_height)
         shapes.extend(new_shapes_blobs)
         shapes.extend(new_shapes_polygons)
         shape_groups.extend(new_shape_groups_blobs)
