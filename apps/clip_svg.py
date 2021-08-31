@@ -183,10 +183,8 @@ def main(args):
     # Use GPU if available
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
-    augment_trans = transforms.Compose([ 
-    transforms.RandomAffine(degrees=(0, 180), translate=(0.5, 0.5), scale=(0.7, 1.0), fill= 1),    
-    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
-    transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
+    augment_trans = transforms.Compose([  
+    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2)
     ])
 
     poz_text_features = load_targets(args.targets)
@@ -237,9 +235,9 @@ def main(args):
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.01)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.01)
-    end_optim = torch.optim.Adam(end_vars, lr=0.01)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
+    end_optim = torch.optim.Adam(end_vars, lr=0.1)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.05)
     # Adam iterations.
 
     for t in range(args.num_iter):
