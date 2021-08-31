@@ -38,7 +38,7 @@ def save_ln_gradient_svg(filename, width, height, shapes, shape_groups):
             for point in points:
                 polygon.append((point[0], point[1]))
             print("polygon", polygon)
-            dwg.add(dwg.polygon(polygon, stroke='none',fill='url(#{})'.format(i)))
+            dwg.add(dwg.polygon(points=polygon, stroke='none',fill='url(#{})'.format(i)))
             
         else: # path for the blob
             num_segments = shape.num_control_points.shape[0]
