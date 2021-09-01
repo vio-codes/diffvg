@@ -43,10 +43,10 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
         num_control_points = torch.zeros(
             num_segments, dtype=torch.int32) + 2
         points = []
-        p0 = (random.random(), random.random())
+        p0 = (0.5, 0.5)
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.3
+            radius = 0.5
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             p2 = (p1[0] + radius * (random.random() - 0.5),
@@ -99,7 +99,7 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
     shape_groups = []
 
     for i in range(num_paths):
-        num_segments = random.randint(4, 6)
+        num_segments = random.randint(3, 7)
         points = []
         p0 = (0.5, 0.5)
         points.append(p0)
