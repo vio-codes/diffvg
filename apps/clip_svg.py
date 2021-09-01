@@ -42,20 +42,25 @@ def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
     for r in range(num_rows):
         cur_y = r * cell_height
         for c in range(num_cols):
+            points = []
             radius_x = 0.05*canvas_width
             radius_y = 0.05*canvas_height
 
             cur_x = c * cell_width
             p0 = [cur_x - radius_x * random.random(),
                  cur_y - radius_y * random.random()]
+            points.append(p0)     
             p1 = [cur_x+cell_width + radius_x * random.random(),
                  cur_y - radius_y * random.random()]
+            points.append(p1)      
             p2 = [cur_x+cell_width + radius_x * random.random(),
                  cur_y+cell_height+radius_y * random.random()]
+            points.append(p2)      
             p3 = [cur_x - radius_x * random.random(),
                  cur_y+cell_height+radius_y * random.random()]
+            points.append(p3)      
             
-            path = path =  pydiffvg.Polygon(points = [p0,p1,p2,p3], is_closed = True)    
+            path = path =  pydiffvg.Polygon(points = points, is_closed = True)    
             shapes.append(path)
             
             gradient = pydiffvg.LinearGradient(begin=torch.tensor(p0),
