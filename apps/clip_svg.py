@@ -151,7 +151,7 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
     shape_groups = []
 
     for i in range(num_paths):
-        num_segments = random.randint(3, 7)
+        num_segments = random.randint(3, 6)
         points = []
         p0 = (0.5, 0.5)
         points.append(p0)
@@ -239,7 +239,7 @@ def main(args):
     augment_trans = transforms.Compose([  
     transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
     transforms.RandomResizedCrop(224, scale=(0.7,0.9)),
-    transforms.ColorJitter(brightness=0.1,saturation=0.1,contrast=0.1,hue=0.1),
+    transforms.ColorJitter(saturation=0.1,hue=0.1),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ])
 
