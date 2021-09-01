@@ -60,7 +60,7 @@ def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
                  cur_y+cell_height+radius_y * random.random()]
             points.append(p3)      
             
-            path = path =  pydiffvg.Polygon(points = points, is_closed = True)    
+            path = path =  pydiffvg.Polygon(points = torch.tensor(points), is_closed = True)    
             shapes.append(path)
             
             gradient = pydiffvg.LinearGradient(begin=torch.tensor(p0),
