@@ -32,6 +32,53 @@ def cos_loss(inputs, targets, y = 1):
     cos_loss = F.cosine_embedding_loss(inputs, targets, y)
     return cos_loss
 
+@torch.no_grad()
+def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
+    num_rows, num_cols = num_paths, num_paths
+    cell_width = canvas_width / num_cols
+    cell_height = canvas_height / num_rows
+    shapes = []
+    shape_groups = []
+    for r in range(num_rows):
+        cur_y = r * cell_height
+        for c in range(num_cols):
+            radius_x = 0.05*canvas_width
+            radius_y = 0.05*canvas_height
+
+            cur_x = c * cell_width
+            p0 = [cur_x - radius_x * random.random(),
+                 cur_y - radius_y * random.random()]
+            p1 = [cur_x+cell_width + radius_x * random.random(),
+                 cur_y - radius_y * random.random()]
+            p2 = [cur_x+cell_width + radius_x * random.random(),
+                 cur_y+cell_height+radius_y * random.random()]
+            p3 = [cur_x - radius_x * random.random(),
+                 cur_y+cell_height+radius_y * random.random()]
+            
+            path = path =  pydiffvg.Polygon(points = [p0,p1,p2,p3], is_closed = True)    
+            shapes.append(path)
+            
+            gradient = pydiffvg.LinearGradient(begin=torch.tensor([x_min, y_min]),
+                                           end=torch.tensor([x_max, y_max]),
+                                           offsets=torch.tensor(
+                                               [0.0, 0.5, 1.0]),
+                                           stop_colors=torch.tensor([[random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()],
+                                                                     [random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()],
+                                                                     [random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()]]))
+            path_group = pydiffvg.ShapeGroup(shape_ids = torch.tensor([len(shapes) - 1+ ids]), fill_color = gradient)
+            shape_groups.append(path_group)
+
+    ids += len(shapes)        
+    return shapes, shape_groups , ids     
 
 @torch.no_grad()
 def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
@@ -206,6 +253,11 @@ def main(args):
         new_shapes, new_shape_groups, _ = generate_polygons(num_paths, canvas_width, canvas_height)
         shapes.extend(new_shapes)
         shape_groups.extend(new_shape_groups)
+    
+    elif args.generate == "grid":
+        new_shapes, new_shape_groups, _ = generate_grid(num_paths, canvas_width, canvas_height)
+        shapes.extend(new_shapes)
+        shape_groups.extend(new_shape_groups)
     else:
         new_shapes_blobs, new_shape_groups_blobs, ids= generate_blobs(int(num_paths*0.5), canvas_width, canvas_height)
         new_shapes_polygons, new_shape_groups_polygons, _ = generate_polygons(int(num_paths*0.5), canvas_width, canvas_height, ids)
@@ -354,7 +406,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--num_aug", type=int, default=2)
-    parser.add_argument("--generate", choices=['blobs', 'polygons', 'mix'])
+    parser.add_argument("--generate", choices=['blobs', 'polygons', 'grid', 'mix'])
     parser.add_argument("--debug", dest='debug', action='store_true')
     parser.add_argument("--augment", dest='augment', action='store_true')
     args = parser.parse_args()
