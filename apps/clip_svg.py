@@ -246,7 +246,7 @@ def main(args):
     poz_text_features = load_targets(args.targets)
 
 
-    canvas_width, canvas_height = 3000, 3000
+    canvas_width, canvas_height = 2000, 2000
     num_paths = args.num_paths
 
     shapes = []
