@@ -63,8 +63,8 @@ def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
             path = path =  pydiffvg.Polygon(points = torch.tensor(points), is_closed = True)    
             shapes.append(path)
             
-            gradient = pydiffvg.LinearGradient(begin=torch.tensor(p0),
-                                           end=torch.tensor(p2),
+            gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(p0[0],p2[0]), random.uniform(p0[1],p2[1])]),
+                                           end=torch.tensor([random.uniform(p0[0],p2[0]), random.uniform(p0[1],p2[1])]),
                                            offsets=torch.tensor(
                                                [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
@@ -122,8 +122,8 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
         x_min = torch.min(path.points[:, 0])
         y_max = torch.max(path.points[:, 1])
         y_min = torch.min(path.points[:, 1])
-        gradient = pydiffvg.LinearGradient(begin=torch.tensor([x_min, y_min]),
-                                           end=torch.tensor([x_max, y_max]),
+        gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
+                                           end=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            offsets=torch.tensor(
                                                [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
@@ -172,8 +172,8 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
         x_min = torch.min(path.points[:, 0])
         y_max = torch.max(path.points[:, 1])
         y_min = torch.min(path.points[:, 1])
-        gradient = pydiffvg.LinearGradient(begin=torch.tensor([x_min, y_min]),
-                                           end=torch.tensor([x_max, y_max]),
+        gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
+                                           end=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            offsets=torch.tensor(
                                                [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
