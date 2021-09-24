@@ -246,7 +246,7 @@ def main(args):
     poz_text_features = load_targets(args.targets)
 
 
-    canvas_width, canvas_height = 224, 224
+    canvas_width, canvas_height = 3000, 3000
     num_paths = args.num_paths
 
     shapes = []
@@ -337,7 +337,7 @@ def main(args):
         loss = 0.0
         NUM_AUGS = args.num_aug
         img_augs = []
-        img_org_feature = clip_utils.simple_img_embed(img)
+        img_org_feature = clip_utils.simple_img_embed(transforms.Resize(size=224)(img))
         image_features = []
         
         for i in range(NUM_AUGS):
@@ -372,8 +372,6 @@ def main(args):
         begin_optim.step()
         end_optim.step()
         offsets_optim.step()
-
-       
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
