@@ -300,8 +300,8 @@ def main(args):
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.1)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.0001)
-    end_optim = torch.optim.Adam(end_vars, lr=0.0001)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.001)
+    end_optim = torch.optim.Adam(end_vars, lr=0.001)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.001)
     # Adam iterations.
 
