@@ -43,8 +43,8 @@ def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
         cur_y = r * cell_height
         for c in range(num_cols):
             points = []
-            radius_x = 0.7*cell_width
-            radius_y = 0.7*cell_height
+            radius_x = 0.5*cell_width
+            radius_y = 0.5*cell_height
 
             cur_x = c * cell_width
             p0 = [cur_x - radius_x * random.random(),
@@ -98,7 +98,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
         p0 = (0.5, 0.5)
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.7
+            radius = 0.5
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             p2 = (p1[0] + radius * (random.random() - 0.5),
@@ -156,7 +156,7 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
         p0 = (0.5, 0.5)
         points.append(p0)
         for j in range(num_segments):
-            radius = 0.7
+            radius = 0.5
             p1 = (p0[0] + radius * (random.random() - 0.5),
                   p0[1] + radius * (random.random() - 0.5))
             points.append(p1)
