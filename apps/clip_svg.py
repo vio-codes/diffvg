@@ -288,7 +288,7 @@ def main(args):
     end_optim = torch.optim.Adam(end_vars, lr=0.01)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.001)
     # Adam iterations.
-    NUM_AUGS = 50
+    NUM_AUGS = 20
     for t in range(args.num_iter):
         print('iteration:', t)
                
