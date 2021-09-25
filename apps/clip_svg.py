@@ -284,11 +284,11 @@ def main(args):
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
     color_optim = torch.optim.Adam(color_vars, lr=0.001)
-    begin_optim = torch.optim.Adam(begin_vars, lr=1.0)
-    end_optim = torch.optim.Adam(end_vars, lr=1.0)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.01)
+    end_optim = torch.optim.Adam(end_vars, lr=0.01)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.001)
     # Adam iterations.
-
+    NUM_AUGS = 1
     for t in range(args.num_iter):
         print('iteration:', t)
                
@@ -319,7 +319,8 @@ def main(args):
         img = img.permute(0, 3, 1, 2) # NHWC -> NCHW                              
         
         loss = 0.0
-        NUM_AUGS = args.num_aug
+        if t % args.increase_aug_every == 0:
+            NUM_AUGS += 1
         img_augs = []
         img_org_feature = clip_utils.simple_img_embed(transforms.Resize(size=224)(img))
         image_features = []
@@ -398,7 +399,7 @@ if __name__ == "__main__":
     parser.add_argument("--targets", help="target text")
     parser.add_argument("--size", type=int, default=2000)
     parser.add_argument("--num_iter", type=int, default=500)
-    parser.add_argument("--num_aug", type=int, default=2)
+    parser.add_argument("--increase_aug_every", type=int, default=100)
     parser.add_argument("--polygons", type=int, default=5)
     parser.add_argument("--blobs", type=int, default=5)
     parser.add_argument("--grids", type=int, default=5)
