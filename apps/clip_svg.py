@@ -43,8 +43,8 @@ def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
         cur_y = r * cell_height
         for c in range(num_cols):
             points = []
-            radius_x = 0.7*cell_width
-            radius_y = 0.7*cell_height
+            radius_x = 0.2*cell_width
+            radius_y = 0.2*cell_height
 
             cur_x = c * cell_width
             p0 = [cur_x - radius_x * random.random(),
