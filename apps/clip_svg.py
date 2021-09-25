@@ -245,9 +245,7 @@ def main(args):
 
     poz_text_features = load_targets(args.targets)
 
-
     canvas_width, canvas_height = args.size, args.size
-    num_paths = args.num_paths
 
     shapes = []
     shape_groups = []
@@ -399,7 +397,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--targets", help="target text")
     parser.add_argument("--size", type=int, default=2000)
-    parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--num_aug", type=int, default=2)
     parser.add_argument("--polygons", type=int, default=5)
