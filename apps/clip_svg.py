@@ -252,30 +252,16 @@ def main(args):
     shapes = []
     shape_groups = []
 
-    if args.generate == "blobs":
-        new_shapes, new_shape_groups, _ = generate_blobs(num_paths, canvas_width, canvas_height)
-        shapes.extend(new_shapes)
-        shape_groups.extend(new_shape_groups)
-    
-    elif args.generate == "polygons":
-        new_shapes, new_shape_groups, _ = generate_polygons(num_paths, canvas_width, canvas_height)
-        shapes.extend(new_shapes)
-        shape_groups.extend(new_shape_groups)
-    
-    elif args.generate == "grid":
-        new_shapes, new_shape_groups, _ = generate_grid(num_paths, canvas_width, canvas_height)
-        shapes.extend(new_shapes)
-        shape_groups.extend(new_shape_groups)
-    else:
-        new_shapes_grid, new_shape_groups_grid, ids = generate_grid(int(num_paths*1/3), canvas_width, canvas_height)
-        new_shapes_blobs, new_shape_groups_blobs, ids= generate_blobs(int(num_paths*1/3), canvas_width, canvas_height, ids)
-        new_shapes_polygons, new_shape_groups_polygons, _ = generate_polygons(int(num_paths*1/3), canvas_width, canvas_height, ids)
-        shapes.extend(new_shapes_grid)
-        shapes.extend(new_shapes_blobs)
-        shapes.extend(new_shapes_polygons)
-        shape_groups.extend(new_shape_groups_grid)
-        shape_groups.extend(new_shape_groups_blobs)
-        shape_groups.extend(new_shape_groups_polygons)
+
+    new_shapes_grid, new_shape_groups_grid, ids = generate_grid(args.grids, canvas_width, canvas_height)
+    new_shapes_blobs, new_shape_groups_blobs, ids= generate_blobs(args.blobs, canvas_width, canvas_height, ids)
+    new_shapes_polygons, new_shape_groups_polygons, _ = generate_polygons(args.polygons, canvas_width, canvas_height, ids)
+    shapes.extend(new_shapes_grid)
+    shapes.extend(new_shapes_blobs)
+    shapes.extend(new_shapes_polygons)
+    shape_groups.extend(new_shape_groups_grid)
+    shape_groups.extend(new_shape_groups_blobs)
+    shape_groups.extend(new_shape_groups_polygons)
                
     
     
@@ -416,7 +402,9 @@ if __name__ == "__main__":
     parser.add_argument("--num_paths", type=int, default=512)
     parser.add_argument("--num_iter", type=int, default=500)
     parser.add_argument("--num_aug", type=int, default=2)
-    parser.add_argument("--generate", choices=['blobs', 'polygons', 'grid', 'mix'])
+    parser.add_argument("--polygons", type=int, default=5)
+    parser.add_argument("--blobs", type=int, default=5)
+    parser.add_argument("--grids", type=int, default=5)
     parser.add_argument("--debug", dest='debug', action='store_true')
     parser.add_argument("--augment", dest='augment', action='store_true')
     args = parser.parse_args()
