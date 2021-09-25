@@ -299,7 +299,7 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.01)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.01)
     end_optim = torch.optim.Adam(end_vars, lr=0.01)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
@@ -350,7 +350,7 @@ def main(args):
             image_features.append(clip_utils.simple_img_embed(aug))
         #Loss compared to original image
         for poz_text_feature in poz_text_features:
-                loss+= NUM_AUGS*(cos_loss(img_org_feature, poz_text_feature) + spherical_dist_loss(img_org_feature, poz_text_feature))
+                loss+= cos_loss(img_org_feature, poz_text_feature) + spherical_dist_loss(img_org_feature, poz_text_feature)
         #Loss compared to augmetations
         if args.augment:
             for _ in range(NUM_AUGS):
