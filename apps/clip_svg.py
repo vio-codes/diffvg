@@ -283,10 +283,10 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.001)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.001)
-    end_optim = torch.optim.Adam(end_vars, lr=0.001)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.001)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
+    end_optim = torch.optim.Adam(end_vars, lr=0.1)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
     # Adam iterations.
     NUM_AUGS = args.num_aug
     for t in range(args.num_iter):
@@ -342,7 +342,7 @@ def main(args):
                 image_features.append(clip_utils.simple_img_embed(aug))
             for image_feature in image_features:
                 for poz_text_feature in poz_text_features:
-                        loss+= (cos_loss(image_feature, poz_text_feature) + spherical_dist_loss(image_feature, poz_text_feature))
+                        loss+= (cos_loss(image_feature, poz_text_feature) + spherical_dist_loss(image_feature, poz_text_feature))/NUM_AUGS
 
 
         print('render loss:', loss.item())
