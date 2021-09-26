@@ -66,12 +66,8 @@ def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
             gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(p0[0],p2[0]), random.uniform(p0[1],p2[1])]),
                                            end=torch.tensor([random.uniform(p0[0],p2[0]), random.uniform(p0[1],p2[1])]),
                                            offsets=torch.tensor(
-                                               [0.0, 0.5, 1.0]),
+                                               [0.0, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
-                                                                      random.random(),
-                                                                      random.random(),
-                                                                      random.random()],
-                                                                     [random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
@@ -125,12 +121,8 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
         gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            end=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            offsets=torch.tensor(
-                                               [0.0, 0.5, 1.0]),
+                                               [0.0, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
-                                                                      random.random(),
-                                                                      random.random(),
-                                                                      random.random()],
-                                                                     [random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
@@ -175,12 +167,8 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
         gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            end=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            offsets=torch.tensor(
-                                               [0.0, 0.5, 1.0]),
+                                               [0.0, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
-                                                                      random.random(),
-                                                                      random.random(),
-                                                                      random.random()],
-                                                                     [random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
@@ -283,9 +271,9 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.1)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.001)
-    end_optim = torch.optim.Adam(end_vars, lr=0.001)
+    color_optim = torch.optim.Adam(color_vars, lr=0.001)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
+    end_optim = torch.optim.Adam(end_vars, lr=0.1)
     offsets_optim = torch.optim.Adam(offsets_vars, lr=0.001)
     # Adam iterations.
     NUM_AUGS = args.num_aug
