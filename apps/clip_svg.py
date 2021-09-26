@@ -225,7 +225,7 @@ def main(args):
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
     augment_trans = transforms.Compose([  
-    transforms.RandomPerspective(fill=1, p=1.0, distortion_scale=0.5),
+    transforms.RandomPerspective(fill=1, p=1.0, distortion_scale=0.3),
     transforms.RandomResizedCrop(224, scale=(0.7,0.9)),
     transforms.ColorJitter(saturation=0.1,hue=0.1),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
@@ -271,10 +271,10 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.1)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
-    end_optim = torch.optim.Adam(end_vars, lr=0.1)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
+    color_optim = torch.optim.Adam(color_vars, lr=0.001)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.001)
+    end_optim = torch.optim.Adam(end_vars, lr=0.001)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.001)
     # Adam iterations.
     NUM_AUGS = args.num_aug
     for t in range(args.num_iter):
