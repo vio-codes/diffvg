@@ -348,9 +348,7 @@ def main(args):
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
-            group.fill_color.offsets[0].data.clamp_(0.0, 0.33)
-            group.fill_color.offsets[1].data.clamp_(0.33, 0.66)
-            group.fill_color.offsets[2].data.clamp_(0.66, 1.0)
+            group.fill_color.offsets.data.clamp_(0.0, 1.0)
             group.fill_color.begin[0].data.clamp_(0.0, canvas_width)
             group.fill_color.begin[1].data.clamp_(0.0, canvas_height)
             group.fill_color.end[0].data.clamp_(0.0, canvas_width)
