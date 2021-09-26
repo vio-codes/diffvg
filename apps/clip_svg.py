@@ -338,12 +338,10 @@ def main(args):
         loss.backward()
 
         # Take a gradient descent step.
-        if t % 2 == 0:
-            color_optim.step()
-            offsets_optim.step()
-        else:    
-            begin_optim.step()
-            end_optim.step()
+        color_optim.step()
+        offsets_optim.step()   
+        begin_optim.step()
+        end_optim.step()
         
 
         for group in shape_groups:
