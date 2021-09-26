@@ -283,10 +283,10 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.01)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
-    end_optim = torch.optim.Adam(end_vars, lr=0.1)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.01)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.001)
+    end_optim = torch.optim.Adam(end_vars, lr=0.001)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.001)
     # Adam iterations.
     NUM_AUGS = args.num_aug
     for t in range(args.num_iter):
@@ -350,11 +350,13 @@ def main(args):
         loss.backward()
 
         # Take a gradient descent step.
-
-        color_optim.step()
-        begin_optim.step()
-        end_optim.step()
-        offsets_optim.step()
+        if t % 2 == 0:
+            color_optim.step()
+            offsets_optim.step()
+        else:    
+            begin_optim.step()
+            end_optim.step()
+        
 
         for group in shape_groups:
             group.fill_color.stop_colors.data.clamp_(0.0, 1.0)
