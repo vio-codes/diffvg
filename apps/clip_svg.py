@@ -66,8 +66,12 @@ def generate_grid(num_paths, canvas_width, canvas_height, ids=0):
             gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(p0[0],p2[0]), random.uniform(p0[1],p2[1])]),
                                            end=torch.tensor([random.uniform(p0[0],p2[0]), random.uniform(p0[1],p2[1])]),
                                            offsets=torch.tensor(
-                                               [0.0, 1.0]),
+                                               [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()],
+                                                                      [random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
@@ -121,8 +125,12 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
         gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            end=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            offsets=torch.tensor(
-                                               [0.0, 1.0]),
+                                               [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()],
+                                                                      [random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
@@ -167,8 +175,12 @@ def generate_polygons(num_paths, canvas_width, canvas_height, ids = 0):
         gradient = pydiffvg.LinearGradient(begin=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            end=torch.tensor([random.uniform(x_min,x_max), random.uniform(y_min,y_max)]),
                                            offsets=torch.tensor(
-                                               [0.0, 1.0]),
+                                               [0.0, 0.5, 1.0]),
                                            stop_colors=torch.tensor([[random.random(),
+                                                                      random.random(),
+                                                                      random.random(),
+                                                                      random.random()],
+                                                                      [random.random(),
                                                                       random.random(),
                                                                       random.random(),
                                                                       random.random()],
@@ -225,7 +237,7 @@ def main(args):
     pydiffvg.set_use_gpu(torch.cuda.is_available())
 
     augment_trans = transforms.Compose([  
-    transforms.RandomPerspective(fill=1, p=1.0, distortion_scale=0.7),
+    transforms.RandomPerspective(fill=1, p=1.0, distortion_scale=0.5),
     transforms.RandomResizedCrop(224, scale=(0.7,0.9)),
     transforms.ColorJitter(saturation=0.1,hue=0.1),
     transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
@@ -240,8 +252,8 @@ def main(args):
 
 
     new_shapes_grid, new_shape_groups_grid, ids = generate_grid(args.grids, canvas_width, canvas_height)
+    new_shapes_polygons, new_shape_groups_polygons, ids = generate_polygons(args.polygons, canvas_width, canvas_height, ids)
     new_shapes_blobs, new_shape_groups_blobs, ids= generate_blobs(args.blobs, canvas_width, canvas_height, ids)
-    new_shapes_polygons, new_shape_groups_polygons, _ = generate_polygons(args.polygons, canvas_width, canvas_height, ids)
     shapes.extend(new_shapes_grid)
     shapes.extend(new_shapes_blobs)
     shapes.extend(new_shapes_polygons)
@@ -270,7 +282,7 @@ def main(args):
     render = pydiffvg.RenderFunction.apply
     # Optimize
 
-    points_optim = torch.optim.Adam(points_vars, lr=2.0)
+    points_optim = torch.optim.Adam(points_vars, lr=0.1)
     color_optim = torch.optim.Adam(color_vars, lr=0.1)
     begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
     end_optim = torch.optim.Adam(end_vars, lr=0.1)
@@ -338,6 +350,7 @@ def main(args):
         loss.backward()
 
         # Take a gradient descent step.
+        points_optim.step()
         color_optim.step()
         offsets_optim.step()   
         begin_optim.step()
