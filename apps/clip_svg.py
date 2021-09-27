@@ -87,7 +87,7 @@ def generate_blobs(num_paths, canvas_width, canvas_height, ids=0):
     shape_groups = []
 
     for i in range(num_paths):
-        num_segments = random.randint(3, 5)
+        num_segments = random.randint(3, 6)
         num_control_points = torch.zeros(
             num_segments, dtype=torch.int32) + 2
         points = []
@@ -271,10 +271,10 @@ def main(args):
     # Optimize
 
     points_optim = torch.optim.Adam(points_vars, lr=2.0)
-    color_optim = torch.optim.Adam(color_vars, lr=0.05)
-    begin_optim = torch.optim.Adam(begin_vars, lr=0.5)
-    end_optim = torch.optim.Adam(end_vars, lr=0.5)
-    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.05)
+    color_optim = torch.optim.Adam(color_vars, lr=0.1)
+    begin_optim = torch.optim.Adam(begin_vars, lr=0.1)
+    end_optim = torch.optim.Adam(end_vars, lr=0.1)
+    offsets_optim = torch.optim.Adam(offsets_vars, lr=0.1)
     # Adam iterations.
     NUM_AUGS = args.num_aug
     for t in range(args.num_iter):
