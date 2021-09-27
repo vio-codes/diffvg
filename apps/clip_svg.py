@@ -340,8 +340,8 @@ def main(args):
         # Take a gradient descent step.
         color_optim.step()
         offsets_optim.step()   
-        begin_optim.step()
-        end_optim.step()
+        #begin_optim.step()
+        #end_optim.step()
         
 
         for group in shape_groups:
