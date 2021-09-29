@@ -394,11 +394,11 @@ def main(args):
             for i in range(paths):
                 print("Stroke:",i)
                 print("Shape:",shapes[:i+1])
-                shape_ids=shape_groups[:i+1].shape_ids
+                shape_ids=shape_groups[:i+1]
 
-                for s_id in shape_ids:
-                    print("shapes id:",s_id)
-                    
+                for shape_group in shape_groups[:i+1]:
+                    print("shapes id:",shape_group.shape_ids)
+
                 scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i+1], shape_groups[:i+1])
                 img = render(size, size, 2, 2, t, None, *scene_args)
                 pydiffvg.imwrite(img.cpu(), '/content/results/clip_svgs/stroke_{}.png'.format(i), gamma=gamma)
