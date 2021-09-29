@@ -385,6 +385,8 @@ def main(args):
     pydiffvg.save_ln_gradient_svg('/content/final.svg',
                                   canvas_width, canvas_height, shapes, shape_groups)
     
+    size = args.size
+    
     if args.stroke_video:
         with torch.no_grad():
             for i in range(paths):
