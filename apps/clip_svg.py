@@ -391,6 +391,7 @@ def main(args):
         with torch.no_grad():
             shape_groups.sort(key=lambda x: x.shape_ids)
             for i in range(paths):
+                print("Stroke:"i+1)
                 scene_args = pydiffvg.RenderFunction.serialize_scene(canvas_width, canvas_height, shapes[:i+1], shape_groups[:i+1])
                 img = render(size, size, 2, 2, 0 , None, *scene_args)
                 img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
