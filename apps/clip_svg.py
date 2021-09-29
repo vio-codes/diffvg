@@ -245,7 +245,7 @@ def main(args):
 
     poz_text_features = load_targets(args.targets)
 
-    canvas_width, canvas_height = args.size, args.size
+    canvas_width, canvas_height = 224, 224
 
     shapes = []
     shape_groups = []
@@ -260,7 +260,8 @@ def main(args):
     shape_groups.extend(new_shape_groups_grid)
     shape_groups.extend(new_shape_groups_blobs)
     shape_groups.extend(new_shape_groups_polygons)
-               
+
+    paths = ids           
     
     
     points_vars = []
@@ -383,6 +384,20 @@ def main(args):
     pydiffvg.imwrite(img.cpu(), "/content/final.png", gamma=gamma)
     pydiffvg.save_ln_gradient_svg('/content/final.svg',
                                   canvas_width, canvas_height, shapes, shape_groups)
+    
+    if args.stroke_video:
+        with torch.no_grad():
+            for i in range(paths):
+                print("Stroke:",i)
+                scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i+1], shape_groups[:i+1])
+                img = render(size, size, 2, 2, t, None, *scene_args)
+                pydiffvg.imwrite(img.cpu(), '/content/results/clip_svgs/stroke_{}.png'.format(i), gamma=gamma)
+        from subprocess import call
+        call(["ffmpeg", "-framerate", "24", "-i",
+              "/content/results/clip_svg/stroke_%d.png", "-c:v", "libx264", "-preset", "veryslow",
+              "-crf", "20", "-vf", "format=yuv420p", "-movflags", "+faststart",
+              "/content/final-stroke.mp4"])    
+    
     if args.debug:
         from subprocess import call
         call(["ffmpeg", "-framerate", "24", "-i",
@@ -400,6 +415,7 @@ if __name__ == "__main__":
     parser.add_argument("--polygons", type=int, default=5)
     parser.add_argument("--blobs", type=int, default=5)
     parser.add_argument("--grids", type=int, default=5)
+    parser.add_argument("--stroke_video", dest='stroke_video', action='store_true')
     parser.add_argument("--debug", dest='debug', action='store_true')
     parser.add_argument("--augment", dest='augment', action='store_true')
     args = parser.parse_args()
