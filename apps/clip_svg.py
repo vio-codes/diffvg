@@ -392,7 +392,7 @@ def main(args):
     if args.stroke_video:
         with torch.no_grad():
             for i in range(paths):
-                print("Stroke:",i)
+                print("Stroke:",i+1)
                 print("Shape:",shapes[:i+1])
                 shape_ids=shape_groups[:i+1]
 
