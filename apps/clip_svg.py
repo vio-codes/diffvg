@@ -393,7 +393,7 @@ def main(args):
         with torch.no_grad():
             for i in range(paths):
                 print("Stroke:",i)
-                scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i+1], shape_groups[:i+1])
+                scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i], shape_groups[:i])
                 img = render(size, size, 2, 2, t, None, *scene_args)
                 pydiffvg.imwrite(img.cpu(), '/content/results/clip_svgs/stroke_{}.png'.format(i), gamma=gamma)
         from subprocess import call
