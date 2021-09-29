@@ -402,7 +402,7 @@ def main(args):
 
                 scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i+1], shape_groups[:i+1])
                 img = render(size, size, 2, 2, t, None, *scene_args)
-                pydiffvg.imwrite(img.cpu(), '/content/results/clip_svgs/stroke_{}.png'.format(i), gamma=gamma)
+                pydiffvg.imwrite(img.cpu(), '/content/results/clip_svg/stroke_{}.png'.format(i), gamma=gamma)
         from subprocess import call
         call(["ffmpeg", "-framerate", "24", "-i",
               "/content/results/clip_svg/stroke_%d.png", "-c:v", "libx264", "-preset", "veryslow",
