@@ -386,7 +386,8 @@ def main(args):
                                   canvas_width, canvas_height, shapes, shape_groups)
     
     size = args.size
-    
+    print("Shapes:",len(shapes))
+    print("Paths:", paths)
     if args.stroke_video:
         with torch.no_grad():
             for i in range(paths):
