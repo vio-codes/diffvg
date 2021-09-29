@@ -393,6 +393,7 @@ def main(args):
             for i in range(paths):
                 scene_args = pydiffvg.RenderFunction.serialize_scene(canvas_width, canvas_height, shapes[:i+1], shape_groups[:i+1])
                 img = render(size, size, 2, 2, 0 , None, *scene_args)
+                img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
                 pydiffvg.imwrite(img.cpu(), '/content/results/clip_svg/stroke_{}.png'.format(i), gamma=gamma)
         from subprocess import call
         call(["ffmpeg", "-framerate", "24", "-i",
