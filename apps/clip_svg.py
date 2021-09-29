@@ -388,6 +388,7 @@ def main(args):
     size = args.size
     print("Shapes:",len(shapes))
     print("Shapes group:",len(shape_groups))
+    shape_groups.sort(key=lambda x: x.shape_ids)
     print("Paths:", paths)
     if args.stroke_video:
         with torch.no_grad():
@@ -399,9 +400,9 @@ def main(args):
                 for shape_group in shape_groups[:i+1]:
                     print("shapes id:",shape_group.shape_ids)
 
-                #scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i+1], shape_groups[:i+1])
-                #img = render(size, size, 2, 2, t, None, *scene_args)
-                #pydiffvg.imwrite(img.cpu(), '/content/results/clip_svgs/stroke_{}.png'.format(i), gamma=gamma)
+                scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i+1], shape_groups[:i+1])
+                img = render(size, size, 2, 2, t, None, *scene_args)
+                pydiffvg.imwrite(img.cpu(), '/content/results/clip_svgs/stroke_{}.png'.format(i), gamma=gamma)
         from subprocess import call
         call(["ffmpeg", "-framerate", "24", "-i",
               "/content/results/clip_svg/stroke_%d.png", "-c:v", "libx264", "-preset", "veryslow",
