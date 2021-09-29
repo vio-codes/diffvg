@@ -387,14 +387,14 @@ def main(args):
     
     size = args.size
     print("Shapes:",len(shapes))
-    print("Shapes shape:",shapes)
+    print("Shapes group:",len(shape_groups))
     print("Paths:", paths)
     if args.stroke_video:
         with torch.no_grad():
             for i in range(paths):
                 print("Stroke:",i)
-                print("Shape:",shapes[:i])
-                print("Shape gropu:",shape_groups[:i])
+                print("Shape:",shapes[:i+1])
+                print("Shape group:",shape_groups[:i+1])
                 scene_args = pydiffvg.RenderFunction.serialize_scene(size, size, shapes[:i+1], shape_groups[:i+1])
                 img = render(size, size, 2, 2, t, None, *scene_args)
                 pydiffvg.imwrite(img.cpu(), '/content/results/clip_svgs/stroke_{}.png'.format(i), gamma=gamma)
