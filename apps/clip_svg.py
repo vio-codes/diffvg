@@ -387,6 +387,7 @@ def main(args):
     
     size = args.size
     print("Shapes:",len(shapes))
+    print("Shapes shape:",shapes.shape)
     print("Paths:", paths)
     if args.stroke_video:
         with torch.no_grad():
