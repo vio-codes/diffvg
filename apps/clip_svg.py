@@ -400,7 +400,7 @@ def main(args):
         call(["ffmpeg", "-framerate", "24", "-i",
               "/content/results/clip_svg/stroke_%d.png", "-c:v", "libx264", "-preset", "veryslow",
               "-crf", "20", "-vf", "format=yuv420p", "-movflags", "+faststart",
-              "/content/final-stroke.mp4"])    
+              "/content/final_stroke.mp4"])    
     
     if args.debug:
         from subprocess import call
